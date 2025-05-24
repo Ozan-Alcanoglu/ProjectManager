@@ -12,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import com.ozan.kotlinaiwork.ui.components.FormDropdownField
 import com.ozan.kotlinaiwork.ui.components.FormTextField
 import com.ozan.kotlinaiwork.ui.theme.Strings
@@ -24,7 +27,8 @@ fun ProjectEditScreen(
     viewModel: ProjectEditViewModel = hiltViewModel(),
     projectId: String? = null,
     onBack: () -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    navController :NavHostController
 ) {
     // ViewModel'den state'i al
     val state by viewModel.state
@@ -139,6 +143,12 @@ fun ProjectEditScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Button(onClick = {
+                navController.navigate("project_detail") // örnek ID: 123
+            }) {
+                Text("Devam Et")
+            }
+
             // Hata mesajı
             state.error?.let { error ->
                 Spacer(modifier = Modifier.height(8.dp))
@@ -151,3 +161,4 @@ fun ProjectEditScreen(
         }
     }
 }
+

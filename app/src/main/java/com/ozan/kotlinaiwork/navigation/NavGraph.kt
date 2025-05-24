@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.ozan.kotlinaiwork.screens.ProjectDetail
 import com.ozan.kotlinaiwork.screens.ProjectListScreen
 import com.ozan.kotlinaiwork.screens.project.ProjectEditScreen
 import com.ozan.kotlinaiwork.viewmodel.ProjectEditViewModel
@@ -15,6 +16,7 @@ import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
 
 sealed class Screen(val route: String) {
     object ProjectList : Screen("project_list")
+    object ProjectDetail : Screen("project_detail")
     object AddProject : Screen("add_project")
     object EditProject : Screen("edit_project/{projectId}") {
         fun createRoute(projectId: String) = "edit_project/$projectId"
@@ -60,9 +62,17 @@ fun NavGraph(
                 viewModel = viewModel,
                 projectId = null,
                 onBack = { navController.navigateUp() },
-                onSave = { navController.navigateUp() }
+                onSave = { navController.navigateUp() },
+                navController = navController
             )
         }
+
+        composable(Screen.ProjectDetail.route) {
+            ProjectDetail()
+        }
+
+
+
 
         composable(
             route = Screen.EditProject.route,
@@ -78,8 +88,10 @@ fun NavGraph(
                 viewModel = viewModel,
                 projectId = projectId,
                 onBack = { navController.navigateUp() },
-                onSave = { navController.navigateUp() }
+                onSave = { navController.navigateUp() },
+                navController = navController
             )
         }
     }
 }
+
