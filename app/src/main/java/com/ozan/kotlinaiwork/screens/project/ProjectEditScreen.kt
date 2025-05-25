@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ozan.kotlinaiwork.ui.components.FormDropdownField
 import com.ozan.kotlinaiwork.ui.components.FormTextField
 import com.ozan.kotlinaiwork.ui.theme.Strings
@@ -30,15 +31,15 @@ fun ProjectEditScreen(
     onSave: () -> Unit,
     navController :NavHostController
 ) {
-    // ViewModel'den state'i al
+
     val state by viewModel.state
 
-    // Project ID'si değiştiğinde viewModel'i güncelle
+
     LaunchedEffect(projectId) {
         projectId?.let { viewModel.loadProject(it) }
     }
 
-    // Kaydetme başarılı olduğunda callback'i çağır
+
     LaunchedEffect(viewModel) {
         viewModel.eventFlow.collect { event ->
             when (event) {
@@ -143,11 +144,15 @@ fun ProjectEditScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Button(onClick = {
-                navController.navigate("project_detail") // örnek ID: 123
-            }) {
-                Text("Devam Et")
-            }
+            Spacer(modifier = Modifier.weight(1f))
+
+                Button(onClick = {
+                    navController.navigate("project_detail")
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text("Devam Et")
+                }
 
             // Hata mesajı
             state.error?.let { error ->

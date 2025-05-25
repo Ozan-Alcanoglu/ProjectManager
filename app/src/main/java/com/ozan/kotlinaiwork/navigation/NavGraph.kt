@@ -68,7 +68,8 @@ fun NavGraph(
         }
 
         composable(Screen.ProjectDetail.route) {
-            ProjectDetail()
+            ProjectDetail(onBack = { navController.navigateUp() },onSave = { navController.navigateUp() },
+                navController = navController)
         }
 
 

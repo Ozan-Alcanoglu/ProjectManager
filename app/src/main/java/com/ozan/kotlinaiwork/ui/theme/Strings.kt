@@ -12,12 +12,13 @@ object Strings {
     const val EDIT = "Düzenle"
     const val ERROR_OCCURRED = "Bir hata oluştu"
     const val LOADING = "Yükleniyor..."
-    
+
     // Project
     const val MY_HOBBY_PROJECTS = "Hobi Projelerim"
     const val ADD_PROJECT = "Proje Ekle"
     const val EDIT_PROJECT = "Projeyi Düzenle"
     const val PROJECT_TITLE = "Proje Başlığı"
+    const val ADD_PROJECT_SUBJECT = "Proje İçeriği Ekle"
     const val PROJECT_DESCRIPTION = "Açıklama (İsteğe Bağlı)"
     const val PROJECT_CATEGORY = "Kategori"
     const val PROJECT_PRIORITY = "Öncelik"
@@ -29,7 +30,7 @@ object Strings {
     const val STATUS_COMPLETED = "Tamamlandı"
     const val STATUS_ON_HOLD = "Beklemede"
     const val NO_PROJECTS_YET = "Henüz proje eklenmemiş"
-    
+
     // Task
     const val TASKS = "Görevler"
     const val ADD_TASK = "Görev Ekle"
@@ -40,11 +41,11 @@ object Strings {
     const val COMPLETED = "Tamamlandı"
     const val NOT_COMPLETED = "Tamamlanmadı"
     const val NO_TASKS_YET = "Henüz görev eklenmemiş"
-    
+
     // Validation
     const val FIELD_REQUIRED = "Bu alan zorunludur"
     const val INVALID_DATE = "Geçersiz tarih"
-    
+
     // Messages
     const val PROJECT_ADDED = "Proje başarıyla eklendi"
     const val PROJECT_UPDATED = "Proje başarıyla güncellendi"
