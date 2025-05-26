@@ -7,15 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHost
+
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.ozan.kotlinaiwork.ui.components.FormDropdownField
 import com.ozan.kotlinaiwork.ui.components.FormTextField
 import com.ozan.kotlinaiwork.ui.theme.Strings

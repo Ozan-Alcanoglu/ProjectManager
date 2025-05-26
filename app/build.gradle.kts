@@ -61,12 +61,14 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    
+
     // Material 2 (for swipe-to-delete)
     implementation("androidx.compose.material:material:1.6.0")
-    
+
     // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation ("androidx.compose.material3:material3:1.1.2") // veya en son sürüm
+
 
     // Hilt
     implementation(libs.hilt.android)
