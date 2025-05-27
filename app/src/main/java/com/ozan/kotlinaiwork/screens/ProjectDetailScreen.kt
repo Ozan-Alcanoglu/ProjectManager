@@ -1,24 +1,31 @@
 package com.ozan.kotlinaiwork.screens
 
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,10 +35,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,18 +58,45 @@ import com.ozan.kotlinaiwork.ui.theme.Strings
 import com.ozan.kotlinaiwork.viewmodel.ProjectEditEvent
 import com.ozan.kotlinaiwork.viewmodel.ProjectEditViewModel
 
+@Immutable
 data class NestedTextField(
     val id: Int,
-    var text: String,
-    val children: MutableList<NestedTextField> = mutableListOf(),
-    var isExpanded: Boolean = true
-)
+    val text: String,
+    val children: List<NestedTextField> = emptyList(),
+    val isExpanded: Boolean = true
+) {
+    fun updateText(newText: String): NestedTextField {
+        return copy(text = newText)
+    }
+    
+    fun addChild(newChild: NestedTextField): NestedTextField {
+        return copy(children = children + newChild)
+    }
+    
+    fun toggleExpanded(): NestedTextField {
+        return copy(isExpanded = !isExpanded)
+    }
+}
+
+private fun updateItemInList(
+    items: List<NestedTextField>,
+    itemId: Int,
+    update: (NestedTextField) -> NestedTextField
+): MutableList<NestedTextField> {
+    return items.map { item ->
+        if (item.id == itemId) {
+            update(item)
+        } else {
+            item.copy(children = updateItemInList(item.children, itemId, update))
+        }
+    }.toMutableList()
+}
 
 @Composable
 fun NestedTextFieldItem(
     item: NestedTextField,
     onAddChild: (NestedTextField) -> Unit,
-    onTextChange: (String) -> Unit,
+    onTextChange: (NestedTextField, String) -> Unit,
     level: Int = 0,
     modifier: Modifier = Modifier
 ) {
@@ -75,7 +108,7 @@ fun NestedTextFieldItem(
         if (level > 0) {
             Box(
                 modifier = Modifier
-                    .offset(x = (-16).dp) // negatif offset ile sola kaydırma
+                    .offset(x = (-16).dp)
                     .padding(end = 8.dp)
                     .size(24.dp)
             ) {
@@ -88,15 +121,15 @@ fun NestedTextFieldItem(
                         .align(Alignment.Center)
                 )
             }
-
         }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
             FormTextField(
                 value = item.text,
-                onValueChange = onTextChange,
+                onValueChange = { onTextChange(item, it) },
                 label = "Başlık",
                 modifier = Modifier
                     .weight(1f)
@@ -120,16 +153,13 @@ fun NestedTextFieldItem(
                 )
             }
         }
-
         // Render children if expanded
         if (item.isExpanded) {
             item.children.forEach { child ->
                 NestedTextFieldItem(
                     item = child,
                     onAddChild = onAddChild,
-                    onTextChange = { newText ->
-                        child.text = newText
-                    },
+                    onTextChange = onTextChange,
                     level = level + 1
                 )
             }
@@ -158,8 +188,6 @@ fun ProjectDetail(
 
     val state by viewModel.state
 
-
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -177,12 +205,10 @@ fun ProjectDetail(
                 actions = {
                     IconButton(
                         onClick = {
-                            items = items.toMutableList().apply {
-                                add(NestedTextField(
-                                    id = counter++,
-                                    text = ""
-                                ))
-                            }
+                            items = (items + NestedTextField(
+                                id = counter++,
+                                text = ""
+                            )).toMutableList()
                         },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
@@ -232,27 +258,24 @@ fun ProjectDetail(
                         onAddChild = { parent ->
                             items = items.map {
                                 if (it.id == parent.id) {
-                                    it.copy(children = it.children.toMutableList().apply {
-                                        add(NestedTextField(
+                                    it.addChild(
+                                        NestedTextField(
                                             id = counter++,
                                             text = ""
-                                        ))
-                                    })
+                                        )
+                                    )
                                 } else it
                             }.toMutableList()
                         },
-                        onTextChange = { newText ->
-                            items = items.map {
-                                if (it.id == item.id) it.copy(text = newText) else it
-                            }.toMutableList()
+                        onTextChange = { updatedItem, newText ->
+                            items = updateItemInList(items, updatedItem.id) { 
+                                it.updateText(newText) 
+                            }
                         },
-                        modifier = Modifier.padding(8.dp),
-
+                        modifier = Modifier.padding(8.dp)
                     )
                 }
             }
-
-
         }
     }
 }

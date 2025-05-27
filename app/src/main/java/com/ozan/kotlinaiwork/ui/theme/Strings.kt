@@ -14,7 +14,7 @@ object Strings {
     const val LOADING = "Yükleniyor..."
 
     // Project
-    const val MY_HOBBY_PROJECTS = "Hobi Projelerim"
+    const val MY_HOBBY_PROJECTS = "Projelerim"
     const val ADD_PROJECT = "Proje Ekle"
     const val EDIT_PROJECT = "Projeyi Düzenle"
     const val PROJECT_TITLE = "Proje Başlığı"
