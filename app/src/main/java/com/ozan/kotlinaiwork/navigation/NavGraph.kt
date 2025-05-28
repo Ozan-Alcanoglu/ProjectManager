@@ -7,8 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.ozan.kotlinaiwork.screens.ProjectDetail
 import com.ozan.kotlinaiwork.screens.ProjectListScreen
+import com.ozan.kotlinaiwork.screens.ProjectDetail
 import com.ozan.kotlinaiwork.screens.project.ProjectEditScreen
 import com.ozan.kotlinaiwork.viewmodel.ProjectEditViewModel
 import com.ozan.kotlinaiwork.viewmodel.ProjectEvent

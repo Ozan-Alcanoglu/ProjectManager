@@ -11,6 +11,7 @@ import java.util.UUID
 data class Project(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
+    val ownerId: String,
     val title: String,
     val description: String? = null,
     val category: String? = null,
