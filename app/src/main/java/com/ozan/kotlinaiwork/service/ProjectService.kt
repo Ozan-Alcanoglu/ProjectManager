@@ -1,9 +1,8 @@
-package com.ozan.kotlinaiwork.repository
+package com.ozan.kotlinaiwork.service
 
 import com.ozan.kotlinaiwork.model.Project
+import com.ozan.kotlinaiwork.repository.ProjectDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,7 +28,6 @@ interface ProjectRepository {
 @Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val projectDao: ProjectDao,
-    private val taskDao: TaskDao
 ) : ProjectRepository {
 
     override suspend fun insert(project: Project) {
@@ -42,7 +40,6 @@ class ProjectRepositoryImpl @Inject constructor(
 
     override suspend fun delete(project: Project) {
         // İlk olarak projeye ait tüm görevleri sil
-        taskDao.deleteByProjectId(project.id)
         // Sonra projeyi sil
         projectDao.delete(project)
     }
@@ -62,23 +59,17 @@ class ProjectRepositoryImpl @Inject constructor(
     override fun getByStatus(status: String): Flow<List<Project>> {
         return projectDao.getByStatus(status)
     }
-    
+
     override fun search(query: String): Flow<List<Project>> {
         return projectDao.search("%$query%")
     }
-    
+
     override suspend fun updateStatus(projectId: String, status: String) {
         projectDao.updateStatus(projectId, status)
     }
 
     override fun getProgress(projectId: String): Flow<Float> {
-        return taskDao.getTotalCount(projectId).map { total ->
-            if (total == 0) 0f
-            else {
-                val completed = taskDao.getCompletedCount(projectId).first()
-                completed.toFloat() / total.toFloat()
-            }
-        }
+        TODO()
     }
 }
 

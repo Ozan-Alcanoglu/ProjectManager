@@ -1,11 +1,11 @@
-package com.ozan.kotlinaiwork.repository
+package com.ozan.kotlinaiwork.service
 
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Tüm repository'ler için temel arayüz
  */
-interface BaseRepository<T, ID> {
+interface BaseService<T, ID> {
     suspend fun insert(item: T)
     suspend fun update(item: T)
     suspend fun delete(item: T)

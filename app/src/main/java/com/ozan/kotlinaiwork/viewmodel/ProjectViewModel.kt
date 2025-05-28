@@ -2,11 +2,10 @@ package com.ozan.kotlinaiwork.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.ozan.kotlinaiwork.model.Project
-import com.ozan.kotlinaiwork.repository.ProjectRepository
+import com.ozan.kotlinaiwork.service.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,7 +16,7 @@ import javax.inject.Inject
 class ProjectViewModel @Inject constructor(
     private val projectRepository: ProjectRepository
 ) : BaseViewModel<ProjectState, ProjectEvent>() {
-    
+
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
     val projects: StateFlow<List<Project>> = _projects
 

@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ozan.kotlinaiwork.repository.ProjectRepository
+import com.ozan.kotlinaiwork.service.ProjectRepository
 import com.ozan.kotlinaiwork.model.Project
 import com.ozan.kotlinaiwork.ui.theme.Strings
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -100,6 +100,7 @@ class ProjectEditViewModel @Inject constructor(
             try {
                 val project = Project(
                     id = _state.value.projectId.ifEmpty { UUID.randomUUID().toString() },
+                    ownerId = "asd",
                     title = title,
                     description = if (description.isNotBlank()) description else null,
                     category = if (category.isNotBlank()) category else null,

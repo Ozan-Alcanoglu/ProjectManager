@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.ozan.kotlinaiwork.repository.AppDatabase
 import com.ozan.kotlinaiwork.repository.ProjectDao
-import com.ozan.kotlinaiwork.repository.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +14,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    
+
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
@@ -26,16 +25,12 @@ object AppModule {
         .fallbackToDestructiveMigration()
         .build()
     }
-    
+
     @Provides
     @Singleton
     fun provideProjectDao(database: AppDatabase): ProjectDao {
         return database.projectDao()
     }
-    
-    @Provides
-    @Singleton
-    fun provideTaskDao(database: AppDatabase): TaskDao {
-        return database.taskDao()
-    }
+
+
 }
