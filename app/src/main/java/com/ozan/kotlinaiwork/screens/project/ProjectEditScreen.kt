@@ -64,22 +64,6 @@ fun ProjectEditScreen(
                             contentDescription = Strings.CANCEL
                         )
                     }
-                },
-                actions = {
-                    TextButton(
-                        onClick = { viewModel.onEvent(ProjectEditEvent.Save) },
-                        enabled = !state.isLoading
-                    ) {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        } else {
-                            Text(Strings.SAVE.uppercase())
-                        }
-                    }
                 }
             )
         }

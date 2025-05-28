@@ -27,31 +27,7 @@ class TaskViewModel @Inject constructor(
 
     private var currentProjectId: String? = null
 
-    fun loadTasks(projectId: String) {
-        currentProjectId = projectId
-        viewModelScope.launch {
-            try {
-                taskService.getRootTasks(projectId).collectLatest { taskList ->
-                    _tasks.value = taskList
-                }
-            } catch (e: Exception) {
-                _error.value = "Görevler yüklenirken bir hata oluştu: ${e.message}"
-            }
-        }
-    }
 
-
-    fun loadSubtasks(parentId: String) {
-        viewModelScope.launch {
-            try {
-                taskService.getSubtasks(parentId).collectLatest { subtasks ->
-                    _tasks.value = subtasks
-                }
-            } catch (e: Exception) {
-                _error.value = "Alt görevler yüklenirken bir hata oluştu: ${e.message}"
-            }
-        }
-    }
 
 
     fun selectTask(task: Task) {
@@ -105,15 +81,7 @@ class TaskViewModel @Inject constructor(
     }
 
 
-    fun moveTask(taskId: String, newParentId: String?, newPosition: Int) {
-        viewModelScope.launch {
-            try {
-                taskService.moveTask(taskId, newParentId, newPosition)
-            } catch (e: Exception) {
-                _error.value = "Görev taşınırken bir hata oluştu: ${e.message}"
-            }
-        }
-    }
+
 
 
     fun clearError() {

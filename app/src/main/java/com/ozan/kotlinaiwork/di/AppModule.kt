@@ -3,7 +3,9 @@ package com.ozan.kotlinaiwork.di
 import android.content.Context
 import androidx.room.Room
 import com.ozan.kotlinaiwork.repository.AppDatabase
+import com.ozan.kotlinaiwork.repository.BranchDao
 import com.ozan.kotlinaiwork.repository.ProjectDao
+import com.ozan.kotlinaiwork.repository.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,6 +32,18 @@ object AppModule {
     @Singleton
     fun provideProjectDao(database: AppDatabase): ProjectDao {
         return database.projectDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTaskDao(database: AppDatabase): BranchDao {
+        return database.branchDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBranchDao(database: AppDatabase): TaskDao {
+        return database.taskDao()
     }
 
 

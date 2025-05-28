@@ -68,11 +68,11 @@ data class NestedTextField(
     fun updateText(newText: String): NestedTextField {
         return copy(text = newText)
     }
-    
+
     fun addChild(newChild: NestedTextField): NestedTextField {
         return copy(children = children + newChild)
     }
-    
+
     fun toggleExpanded(): NestedTextField {
         return copy(isExpanded = !isExpanded)
     }
@@ -94,6 +94,7 @@ private fun updateItemInList(
 
 @Composable
 fun NestedTextFieldItem(
+    viewModel: ProjectEditViewModel= hiltViewModel(),
     item: NestedTextField,
     onAddChild: (NestedTextField) -> Unit,
     onTextChange: (NestedTextField, String) -> Unit,
@@ -153,7 +154,8 @@ fun NestedTextFieldItem(
                 )
             }
         }
-        // Render children if expanded
+
+
         if (item.isExpanded) {
             item.children.forEach { child ->
                 NestedTextFieldItem(
@@ -268,13 +270,22 @@ fun ProjectDetail(
                             }.toMutableList()
                         },
                         onTextChange = { updatedItem, newText ->
-                            items = updateItemInList(items, updatedItem.id) { 
-                                it.updateText(newText) 
+                            items = updateItemInList(items, updatedItem.id) {
+                                it.updateText(newText)
                             }
                         },
                         modifier = Modifier.padding(8.dp)
                     )
                 }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(onClick = {
+                viewModel.onEvent(ProjectEditEvent.Save)
+            },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Kaydet")
             }
         }
     }
