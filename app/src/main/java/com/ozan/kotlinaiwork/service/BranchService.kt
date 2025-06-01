@@ -8,9 +8,7 @@ import javax.inject.Inject
 class BranchService @Inject constructor(
     private val branchDao: BranchDao
 ) {
-    fun getBranches(projectId: String): Flow<List<Branch>> {
-        return branchDao.getBranchesByProject(projectId)
-    }
+
 
 
     suspend fun getBranchById(branchId: String): Branch? {
@@ -18,11 +16,10 @@ class BranchService @Inject constructor(
     }
 
 
-    suspend fun addBranch(projectId: String, name: String, description: String? = null) {
+    suspend fun addBranch( name: String, description: String? = null) {
         val branch = Branch(
-            projectId = projectId,
+
             name = name,
-            description = description
         )
         branchDao.insertBranch(branch)
     }
@@ -45,7 +42,5 @@ class BranchService @Inject constructor(
     }
 
 
-    suspend fun deleteAllBranchesForProject(projectId: String) {
-        branchDao.deleteAllBranchesForProject(projectId)
-    }
+
 }

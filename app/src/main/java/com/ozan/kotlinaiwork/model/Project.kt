@@ -11,18 +11,11 @@ import java.util.UUID
 data class Project(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val ownerId: String,
     val title: String,
     val description: String? = null,
-    val category: String? = null,
-    val priority: Int = 2, // 0: Düşük, 1: Orta, 2: Yüksek
-    val status: String = "active", // active, completed, on_hold, cancelled
-    val startDate: Long = System.currentTimeMillis(),
-    val targetDate: Long? = null,
-    val imageUri: String? = null,
-    val estimatedHours: Float = 0f,
-    val spentHours: Float = 0f
+    val priority: Int = 2,
+    val status: String = "active",
+
 ) {
-    val progress: Float
-        get() = if (estimatedHours > 0) (spentHours / estimatedHours).coerceIn(0f, 1f) else 0f
+
 }

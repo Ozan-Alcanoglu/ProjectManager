@@ -7,7 +7,5 @@ import java.util.UUID
 @Entity(tableName = "branches")
 data class Branch(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val projectId: String,
-    val name: String,
-    val description: String? = null,
+    val name: String
 )

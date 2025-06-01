@@ -22,7 +22,7 @@ object AppModule {
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
             context,
-            AppDatabase::class.java, "hobby_project_db"
+            AppDatabase::class.java, "project_db"
         )
         .fallbackToDestructiveMigration()
         .build()

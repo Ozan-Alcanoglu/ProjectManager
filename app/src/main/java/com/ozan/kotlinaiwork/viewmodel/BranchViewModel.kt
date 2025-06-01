@@ -1,4 +1,4 @@
-package com.ozan.kotlinaiwork.viewmodel
+/*package com.ozan.kotlinaiwork.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -82,7 +82,7 @@ class BranchViewModel @Inject constructor(
                     _error.value = "Bu dala ait $taskCount görev bulunuyor. Önce bu görevleri başka bir dala taşıyın veya silin."
                     return@launch
                 }
-                
+
                 branchService.deleteBranch(branch)
                 if (_selectedBranch.value?.id == branch.id) {
                     _selectedBranch.value = null
@@ -98,3 +98,4 @@ class BranchViewModel @Inject constructor(
         _error.value = null
     }
 }
+*/

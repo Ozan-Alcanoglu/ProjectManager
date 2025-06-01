@@ -1,4 +1,4 @@
-package com.ozan.kotlinaiwork.ui.components
+/*package com.ozan.kotlinaiwork.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -28,7 +28,7 @@ fun ProjectItem(
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    
+
     // Sağ tık menüsü
     if (showContextMenu) {
         Popup(
@@ -56,7 +56,7 @@ fun ProjectItem(
                             )
                         }
                     )
-                    
+
                     if (onDeleteClick != null) {
                         DropdownMenuItem(
                             text = { Text("Sil", color = MaterialTheme.colorScheme.error) },
@@ -77,7 +77,7 @@ fun ProjectItem(
             }
         }
     }
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -98,7 +98,7 @@ fun ProjectItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             project.description?.takeIf { it.isNotBlank() }?.let { description ->
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -109,9 +109,9 @@ fun ProjectItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // İlerleme çubuğu
             LinearProgressIndicator(
                 progress = project.progress,
@@ -119,9 +119,9 @@ fun ProjectItem(
                     .fillMaxWidth()
                     .height(8.dp)
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // İlerleme yüzdesi
             Text(
                 text = "${(project.progress * 100).toInt()}% Tamamlandı",
@@ -131,3 +131,4 @@ fun ProjectItem(
         }
     }
 }
+*/

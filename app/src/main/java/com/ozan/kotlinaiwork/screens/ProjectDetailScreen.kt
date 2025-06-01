@@ -39,6 +39,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,9 +55,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ozan.kotlinaiwork.ui.components.FormTextField
-import com.ozan.kotlinaiwork.ui.theme.Strings
-import com.ozan.kotlinaiwork.viewmodel.ProjectEditEvent
-import com.ozan.kotlinaiwork.viewmodel.ProjectEditViewModel
+
+import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
 
 @Immutable
 data class NestedTextField(
@@ -94,7 +94,7 @@ private fun updateItemInList(
 
 @Composable
 fun NestedTextFieldItem(
-    viewModel: ProjectEditViewModel= hiltViewModel(),
+    sharedViewModel: SharedViewModel= hiltViewModel(),
     item: NestedTextField,
     onAddChild: (NestedTextField) -> Unit,
     onTextChange: (NestedTextField, String) -> Unit,
@@ -172,48 +172,45 @@ fun NestedTextFieldItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectDetail(
-    viewModel: ProjectEditViewModel = hiltViewModel(),
-    projectId: String? = null,
+    sharedViewModel: SharedViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onSave: () -> Unit,
     navController: NavHostController
 ) {
     var counter by remember { mutableStateOf(0) }
 
-    LaunchedEffect(projectId) {
-        projectId?.let { viewModel.loadProject(it) }
-    }
-
-    val items = viewModel.items
 
 
-    val state by viewModel.state
+    val items by sharedViewModel.nestedTextFields.collectAsState()
+//
+//
+//    val state by viewModel.state
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (projectId == null) Strings.ADD_PROJECT else Strings.EDIT_PROJECT)
+                    Text("Projeyi Detaylandırın")
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = Strings.CANCEL
+                            contentDescription = "İptal"
                         )
                     }
                 },
                 actions = {
                     IconButton(
                         onClick = {
-                            viewModel.updateItems(items + NestedTextField(id = counter++, text = ""))
+                            sharedViewModel.updateItems(items + NestedTextField(id = counter++, text = ""))
 
                         },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = Strings.ADD_PROJECT
+                            contentDescription = "Proje Ekle"
                         )
                     }
                 }
@@ -259,14 +256,14 @@ fun ProjectDetail(
                                 if (it.id == parent.id) it.addChild(NestedTextField(id = counter++, text = ""))
                                 else it
                             }
-                            viewModel.updateItems(newItems)
+                            sharedViewModel.updateItems(newItems)
                         }
                         ,
                         onTextChange = { updatedItem, newText ->
-                            val updatedItems = updateItemInList(viewModel.items, updatedItem.id) {
+                            val updatedItems = updateItemInList(sharedViewModel.items, updatedItem.id) {
                                 it.updateText(newText)
                             }
-                            viewModel.updateItems(updatedItems)
+                            sharedViewModel.updateItems(updatedItems)
                         }
                         ,
                         modifier = Modifier.padding(8.dp)
@@ -276,8 +273,41 @@ fun ProjectDetail(
             Spacer(modifier = Modifier.weight(1f))
 
             Button(onClick = {
-                viewModel.setTasks(items)
-                viewModel.onEvent(ProjectEditEvent.Save)
+
+                val title=sharedViewModel.titleD
+                val description=sharedViewModel.descriptionD
+                val priority=sharedViewModel.priorityD
+
+                sharedViewModel.addProject(title,description,priority)
+
+                items.forEach { rootItem ->
+                    sharedViewModel.addBranch(rootItem.text)
+                }
+
+
+                sharedViewModel.project.value?.id?.let { projectId ->
+                    items.forEach { rootItem ->
+
+                        rootItem.children.forEach { childItem ->
+                            sharedViewModel.addTask(
+                                projectId = projectId,
+                                description = childItem.text,
+                                parentId = rootItem.id.toString()
+                            )
+
+
+                            childItem.children.forEach { subChildItem ->
+                                sharedViewModel.addTask(
+                                    projectId = projectId,
+                                    description = subChildItem.text,
+                                    parentId = childItem.id.toString()
+                                )
+                            }
+                        }
+                    }
+                }
+
+
             },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 16.dp)
             ) {
@@ -290,11 +320,5 @@ fun ProjectDetail(
 @Composable
 fun Test() {
 
-    val viewModel: ProjectEditViewModel = hiltViewModel()
-    val projectId: String? = null
-    val onBack: () -> Unit = {}
-    val onSave: () -> Unit = {}
-    val navController: NavHostController = NavHostController(
-        context = TODO()
-    )
+
 }

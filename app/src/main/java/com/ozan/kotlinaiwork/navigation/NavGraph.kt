@@ -10,9 +10,8 @@ import androidx.navigation.navArgument
 import com.ozan.kotlinaiwork.screens.ProjectListScreen
 import com.ozan.kotlinaiwork.screens.ProjectDetail
 import com.ozan.kotlinaiwork.screens.project.ProjectEditScreen
-import com.ozan.kotlinaiwork.viewmodel.ProjectEditViewModel
-import com.ozan.kotlinaiwork.viewmodel.ProjectEvent
-import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
+import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
+
 
 sealed class Screen(val route: String) {
     object ProjectList : Screen("project_list")
@@ -37,30 +36,21 @@ fun NavGraph(
         startDestination = startDestination
     ) {
         composable(Screen.ProjectList.route) {
-            val viewModel: ProjectViewModel = hiltViewModel()
+            val sharedViewModel: SharedViewModel = hiltViewModel()
             ProjectListScreen(
-                onNavigate = { event ->
-                    when (event) {
-                        is ProjectEvent.NavigateToAddProject -> {
-                            navController.navigate(Screen.AddProject.route)
-                        }
-                        is ProjectEvent.NavigateToProjectDetail -> {
-                            navController.navigate(
-                                Screen.EditProject.createRoute(event.projectId)
-                            )
-                        }
-                        else -> { /* Diğer event'ler */ }
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        launchSingleTop = true
                     }
                 },
-                viewModel = viewModel
+                sharedViewModel = sharedViewModel
             )
         }
 
         composable(Screen.AddProject.route) {
-            val viewModel: ProjectEditViewModel = hiltViewModel()
+            val viewModel: SharedViewModel = hiltViewModel()
             ProjectEditScreen(
-                viewModel = viewModel,
-                projectId = null,
+                sharedViewModel = viewModel,
                 onBack = { navController.navigateUp() },
                 onSave = { navController.navigateUp() },
                 navController = navController
@@ -82,12 +72,10 @@ fun NavGraph(
                     type = NavType.StringType
                 }
             )
-        ) { backStackEntry ->
-            val projectId = backStackEntry.arguments?.getString(Screen.PROJECT_ID_ARG) ?: ""
-            val viewModel: ProjectEditViewModel = hiltViewModel()
+        ) {
+            val viewModel: SharedViewModel = hiltViewModel()
             ProjectEditScreen(
-                viewModel = viewModel,
-                projectId = projectId,
+                sharedViewModel = viewModel,
                 onBack = { navController.navigateUp() },
                 onSave = { navController.navigateUp() },
                 navController = navController

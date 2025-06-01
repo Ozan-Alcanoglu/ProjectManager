@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BranchDao {
-    @Query("SELECT * FROM branches WHERE projectId = :projectId ORDER BY name ASC")
-    fun getBranchesByProject(projectId: String): Flow<List<Branch>>
 
     @Query("SELECT * FROM branches WHERE id = :branchId")
     suspend fun getBranchById(branchId: String): Branch?
@@ -23,8 +21,7 @@ interface BranchDao {
     suspend fun deleteBranch(branch: Branch)
 
 
-    @Query("DELETE FROM branches WHERE projectId = :projectId")
-    suspend fun deleteAllBranchesForProject(projectId: String)
+
 
 
     @Query("SELECT COUNT(*) FROM project_items WHERE branchId = :branchId")
