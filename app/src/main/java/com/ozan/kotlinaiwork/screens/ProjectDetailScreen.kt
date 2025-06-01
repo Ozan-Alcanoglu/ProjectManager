@@ -184,9 +184,8 @@ fun ProjectDetail(
         projectId?.let { viewModel.loadProject(it) }
     }
 
-    var items by remember {
-        mutableStateOf(mutableListOf<NestedTextField>())
-    }
+    val items = viewModel.items
+
 
     val state by viewModel.state
 
@@ -194,7 +193,7 @@ fun ProjectDetail(
         topBar = {
             TopAppBar(
                 title = {
-                    androidx.compose.material3.Text(if (projectId == null) Strings.ADD_PROJECT else Strings.EDIT_PROJECT)
+                    Text(if (projectId == null) Strings.ADD_PROJECT else Strings.EDIT_PROJECT)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -207,10 +206,8 @@ fun ProjectDetail(
                 actions = {
                     IconButton(
                         onClick = {
-                            items = (items + NestedTextField(
-                                id = counter++,
-                                text = ""
-                            )).toMutableList()
+                            viewModel.updateItems(items + NestedTextField(id = counter++, text = ""))
+
                         },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
@@ -258,22 +255,20 @@ fun ProjectDetail(
                     NestedTextFieldItem(
                         item = item,
                         onAddChild = { parent ->
-                            items = items.map {
-                                if (it.id == parent.id) {
-                                    it.addChild(
-                                        NestedTextField(
-                                            id = counter++,
-                                            text = ""
-                                        )
-                                    )
-                                } else it
-                            }.toMutableList()
-                        },
+                            val newItems = items.map {
+                                if (it.id == parent.id) it.addChild(NestedTextField(id = counter++, text = ""))
+                                else it
+                            }
+                            viewModel.updateItems(newItems)
+                        }
+                        ,
                         onTextChange = { updatedItem, newText ->
-                            items = updateItemInList(items, updatedItem.id) {
+                            val updatedItems = updateItemInList(viewModel.items, updatedItem.id) {
                                 it.updateText(newText)
                             }
-                        },
+                            viewModel.updateItems(updatedItems)
+                        }
+                        ,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
@@ -281,9 +276,10 @@ fun ProjectDetail(
             Spacer(modifier = Modifier.weight(1f))
 
             Button(onClick = {
+                viewModel.setTasks(items)
                 viewModel.onEvent(ProjectEditEvent.Save)
             },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 16.dp)
             ) {
                 Text("Kaydet")
             }
@@ -294,6 +290,11 @@ fun ProjectDetail(
 @Composable
 fun Test() {
 
-
-
+    val viewModel: ProjectEditViewModel = hiltViewModel()
+    val projectId: String? = null
+    val onBack: () -> Unit = {}
+    val onSave: () -> Unit = {}
+    val navController: NavHostController = NavHostController(
+        context = TODO()
+    )
 }

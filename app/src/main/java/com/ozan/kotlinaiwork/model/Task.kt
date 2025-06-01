@@ -36,9 +36,9 @@ data class Task(
 
     val description: String? = null,
 
-    val projectId: String, // Hangi projeye ait
+    val projectId: String,
 
-    val parentId: String? = null, // Eğer null ise kök öğe
+    val parentId: String? = null,
 
     @ColumnInfo(name = "sort_order")
     val sortOrder: Int = 0

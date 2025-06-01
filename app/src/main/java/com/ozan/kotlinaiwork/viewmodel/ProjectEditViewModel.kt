@@ -6,6 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ozan.kotlinaiwork.service.ProjectRepository
 import com.ozan.kotlinaiwork.model.Project
+import com.ozan.kotlinaiwork.model.Task
+import com.ozan.kotlinaiwork.repository.TaskDao
+import com.ozan.kotlinaiwork.screens.NestedTextField
+import com.ozan.kotlinaiwork.service.TaskService
 import com.ozan.kotlinaiwork.ui.theme.Strings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,11 +20,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProjectEditViewModel @Inject constructor(
-    private val repository: ProjectRepository
+    private val repository: ProjectRepository,
+    private val taskrepo:TaskDao
 ) : ViewModel() {
+
+    private val _items = mutableStateOf<List<NestedTextField>>(emptyList())
+    val items: List<NestedTextField> get() = _items.value
+
+    fun addRootItem() {
+        val id = _items.value.size
+        _items.value = _items.value + NestedTextField(id = id, text = "")
+    }
+
+    fun updateItems(newItems: List<NestedTextField>) {
+        _items.value = newItems
+    }
 
     private val _state = mutableStateOf(ProjectEditState())
     val state = _state
+
+    private var taskFields: List<NestedTextField> = emptyList()
+
+    fun setTasks(tasks: List<NestedTextField>) {
+        taskFields = tasks
+    }
 
     private val _eventFlow = MutableSharedFlow<ProjectEditEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -109,6 +132,11 @@ class ProjectEditViewModel @Inject constructor(
                     status = "active"
                 )
 
+                val tasks = convertNestedFieldsToTasks(items, project.id)
+                tasks.forEach { task ->
+                    taskrepo.insertTask(task)
+                }
+
                 if (_state.value.projectId.isNotEmpty()) {
                     repository.update(project)
                 } else {
@@ -151,3 +179,25 @@ sealed class ProjectEditEvent {
     object Save : ProjectEditEvent()
     data class ShowMessage(val message: String) : ProjectEditEvent()
 }
+fun convertNestedFieldsToTasks(
+    fields: List<NestedTextField>,
+    projectId: String,
+    parentId: String? = null
+): List<Task> {
+    val result = mutableListOf<Task>()
+    var order = 0
+    for (field in fields) {
+        val taskId = UUID.randomUUID().toString()
+        val task = Task(
+            id = taskId,
+            description = field.text,
+            projectId = projectId,
+            parentId = parentId,
+            sortOrder = order++
+        )
+        result.add(task)
+        result.addAll(convertNestedFieldsToTasks(field.children, projectId, taskId))
+    }
+    return result
+}
+

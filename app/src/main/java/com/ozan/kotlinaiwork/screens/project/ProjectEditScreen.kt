@@ -126,13 +126,18 @@ fun ProjectEditScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-                Button(onClick = {
-                    navController.navigate("project_detail")
-                    },
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text("Devam Et")
-                }
+            val isFormValid = state.title.isNotBlank() &&
+                state.category.isNotBlank() &&
+                state.priority.isNotBlank()
+
+            Button(onClick = {
+                navController.navigate("project_detail")
+                },
+                enabled = isFormValid,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text("Devam Et")
+            }
 
             // Hata mesajı
             state.error?.let { error ->

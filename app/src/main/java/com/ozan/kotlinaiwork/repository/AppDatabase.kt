@@ -10,9 +10,7 @@ import com.ozan.kotlinaiwork.model.Converters
 import com.ozan.kotlinaiwork.model.Project
 import com.ozan.kotlinaiwork.model.Task
 
-/**
- * Uygulama veritabanı sınıfı
- */
+
 @Database(
     entities = [Project::class,Task::class,Branch::class],
     version = 2,

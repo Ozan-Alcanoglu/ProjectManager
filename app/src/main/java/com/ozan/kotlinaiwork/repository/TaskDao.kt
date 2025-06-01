@@ -24,5 +24,8 @@ interface TaskDao {
 
     @Query("DELETE FROM project_items WHERE projectId = :projectId")
     suspend fun deleteAllTasksForProject(projectId: String)
+    
+    @Query("SELECT * FROM project_items WHERE projectId = :projectId")
+    suspend fun getTasksByProject(projectId: String): List<Task>
 
 }

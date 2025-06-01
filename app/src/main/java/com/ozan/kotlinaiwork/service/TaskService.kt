@@ -29,7 +29,10 @@ class TaskService @Inject constructor(
 
     suspend fun deleteTask(task: Task) {
         taskDao.deleteTask(task)
-
+    }
+    
+    suspend fun getTasksByProject(projectId: String): List<Task> {
+        return taskDao.getTasksByProject(projectId)
     }
 
 
