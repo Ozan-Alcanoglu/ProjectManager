@@ -298,31 +298,32 @@ fun ProjectDetail(
                                     val branchResult = sharedViewModel.addBranch(rootItem.text)
 
                                     branchResult.onSuccess { branch ->
-                                        // Ana task (branch) ekleniyor
-                                        sharedViewModel.addTask(
+                                        val mainTaskResult = sharedViewModel.addTask(
                                             projectId = projectId,
-                                            branchId = branch.id,  // branch.id zaten String
+                                            branchId = branch.id,
                                             description = rootItem.text,
-                                            parentId = null  // Ana task olduğu için parentId null
+                                            parentId = null
                                         )
 
-                                        // Alt task'lar ekleniyor
-                                        rootItem.children.forEach { childItem ->
-                                            sharedViewModel.addTask(
-                                                projectId = projectId,
-                                                branchId = branch.id,  // branch.id zaten String
-                                                description = childItem.text,
-                                                parentId = rootItem.id.toString()  // Int'i String'e çevir
-                                            )
-
-                                            // Alt-alt task'lar ekleniyor
-                                            childItem.children.forEach { subChildItem ->
-                                                sharedViewModel.addTask(
+                                        mainTaskResult.onSuccess { mainTask ->
+                                            rootItem.children.forEach { childItem ->
+                                                val childTaskResult = sharedViewModel.addTask(
                                                     projectId = projectId,
-                                                    branchId = branch.id,  // branch.id zaten String
-                                                    description = subChildItem.text,
-                                                    parentId = childItem.id.toString()  // Int'i String'e çevir
+                                                    branchId = branch.id,
+                                                    description = childItem.text,
+                                                    parentId = mainTask.id
                                                 )
+
+                                                childTaskResult.onSuccess { childTask ->
+                                                    childItem.children.forEach { subChildItem ->
+                                                        sharedViewModel.addTask(
+                                                            projectId = projectId,
+                                                            branchId = branch.id,
+                                                            description = subChildItem.text,
+                                                            parentId = childTask.id
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
                                     }.onFailure { e ->
