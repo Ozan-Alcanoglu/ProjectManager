@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ozan.kotlinaiwork.screens.ProjectListScreen
 import com.ozan.kotlinaiwork.screens.ProjectDetail
-import com.ozan.kotlinaiwork.screens.project.ProjectEditScreen
+import com.ozan.kotlinaiwork.screens.project.ProjectCreateScreen
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
 
 
@@ -31,26 +31,26 @@ fun NavGraph(
     navController: NavHostController,
     startDestination: String = Screen.ProjectList.route
 ) {
+
+    val sharedViewModel: SharedViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
         composable(Screen.ProjectList.route) {
-            val sharedViewModel: SharedViewModel = hiltViewModel()
             ProjectListScreen(
                 onNavigate = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
                     }
                 },
-                sharedViewModel = sharedViewModel
             )
         }
 
         composable(Screen.AddProject.route) {
-            val viewModel: SharedViewModel = hiltViewModel()
-            ProjectEditScreen(
-                sharedViewModel = viewModel,
+            ProjectCreateScreen(
+                sharedViewModel=sharedViewModel,
                 onBack = { navController.navigateUp() },
                 onSave = { navController.navigateUp() },
                 navController = navController
@@ -58,7 +58,10 @@ fun NavGraph(
         }
 
         composable(Screen.ProjectDetail.route) {
-            ProjectDetail(onBack = { navController.navigateUp() },onSave = { navController.navigateUp() },
+            ProjectDetail(
+                sharedViewModel=sharedViewModel,
+                onBack = { navController.navigateUp() },
+                onSave = { navController.navigateUp() },
                 navController = navController)
         }
 
@@ -73,9 +76,8 @@ fun NavGraph(
                 }
             )
         ) {
-            val viewModel: SharedViewModel = hiltViewModel()
-            ProjectEditScreen(
-                sharedViewModel = viewModel,
+            ProjectCreateScreen(
+                sharedViewModel=sharedViewModel,
                 onBack = { navController.navigateUp() },
                 onSave = { navController.navigateUp() },
                 navController = navController

@@ -40,13 +40,13 @@ class TaskViewModel @Inject constructor(
     }
 
 
-    fun addTask(projectId: String, description: String, parentId: String? = null) {
+    fun addTask(projectId: String, taskname: String, parentId: String? = null) {
         viewModelScope.launch {
             try {
                 val task = Task(
                     projectId = projectId,
                     parentId = parentId,
-                    description = description
+                    description = taskname
                 )
                 taskService.addTask(task)
             } catch (e: Exception) {

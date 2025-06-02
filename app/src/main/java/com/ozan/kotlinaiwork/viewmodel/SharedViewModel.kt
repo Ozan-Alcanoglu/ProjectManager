@@ -26,8 +26,13 @@ class SharedViewModel @Inject constructor(
     private val projectService: ProjectRepositoryImpl
 ) : ViewModel() {
 
+    private var itemIdCounter = 0
 
-    // SharedViewModel.kt içine eklenecek
+    fun getNextItemId(): Int {
+        return itemIdCounter++
+    }
+
+
     private val _nestedTextFields = MutableStateFlow<List<NestedTextField>>(emptyList())
     val nestedTextFields: StateFlow<List<NestedTextField>> = _nestedTextFields
 
@@ -35,20 +40,27 @@ class SharedViewModel @Inject constructor(
         _nestedTextFields.value = newItems
     }
 
-    // items property'si için
     val items: List<NestedTextField>
         get() = _nestedTextFields.value
-
 
     private val _project = MutableStateFlow<Project?>(null)
     val project: StateFlow<Project?> = _project
 
-    // Branch ve Task geçici verileri
     private val _branches = MutableStateFlow<List<Branch>>(emptyList())
     val branches: StateFlow<List<Branch>> = _branches
 
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     val tasks: StateFlow<List<Task>> = _tasks
+
+    var title by mutableStateOf("")
+    var description by mutableStateOf("")
+    var priority by mutableStateOf(1)
+
+    fun saveProjectData(titleD: String, descriptionD: String, priorityD: Int) {
+        title = titleD
+        description = descriptionD
+        priority = priorityD
+    }
 
     fun setProject(project: Project) {
         _project.value = project
@@ -76,73 +88,51 @@ class SharedViewModel @Inject constructor(
         _tasks.value = emptyList()
     }
 
-    var titleD by mutableStateOf("")
-    var descriptionD by mutableStateOf("")
-    var priorityD by mutableStateOf(0)
-
-    fun saveProjectData(title: String, description: String,  priority: Int) {
-        titleD = title
-        descriptionD = description
-        priorityD = priority
+    suspend fun addProject(title: String, description: String?, priority: Int): Result<Project> {
+        return try {
+            val project = Project(
+                title = title,
+                description = description,
+                priority = priority
+            )
+            val insertedId = projectService.insert(project)
+            val insertedProject = project.copy(id = insertedId)
+            _project.value = insertedProject
+            Result.success(insertedProject)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
+    suspend fun addTask(projectId: String,branchId:String, description: String, parentId: String? = null): Result<Task> {
+        return try {
+            val task = Task(
+                branchId=branchId,
+                description = description,
+                projectId = projectId,
+                parentId = parentId
+            )
+            taskService.addTask(task)
+            _tasks.value = _tasks.value + task
+            Result.success(task)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
-    fun addProject(title: String, description: String? = null, priority: Int = 2) {
-        viewModelScope.launch {
-            try {
-                val project = Project(
-                    title = title,
-                    description = description,
-                    priority = priority
-                )
-                projectService.insert(project)
-                _project.value = project
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    suspend fun addBranch(name: String): Result<Branch> {
+        return try {
+            val branchId = branchService.addBranch(name)
+            val insertedBranch = Branch(
+                id = branchId,
+                name = name
+            )
+            _branches.value = _branches.value + insertedBranch
+            Result.success(insertedBranch)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
 
-    fun addTask(
-        projectId: String,
-        description: String,
-        parentId: String? = null,
-        branchId: String? = null
-    ) {
-        viewModelScope.launch {
-            try {
-                val task = Task(
-                    id = UUID.randomUUID().toString(),
-                    projectId = projectId,
-                    description = description,
-                    parentId = parentId,
-                    branchId = branchId
-                )
-                taskService.addTask(task)
-                _tasks.value = _tasks.value + task
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-
-    fun addBranch(name: String, description: String? = null) {
-        viewModelScope.launch {
-            try {
-                branchService.addBranch(
-                    name = name,
-                    description = description
-                )
-                val branch = Branch(
-                    id = UUID.randomUUID().toString(),
-                    name = name
-                )
-                _branches.value = _branches.value + branch
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 }

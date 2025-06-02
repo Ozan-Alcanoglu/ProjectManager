@@ -16,12 +16,13 @@ class BranchService @Inject constructor(
     }
 
 
-    suspend fun addBranch( name: String, description: String? = null) {
+    suspend fun addBranch( name: String):String {
         val branch = Branch(
 
             name = name,
         )
         branchDao.insertBranch(branch)
+        return branch.id
     }
 
 

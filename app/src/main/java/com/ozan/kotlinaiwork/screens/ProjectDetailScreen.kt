@@ -1,6 +1,7 @@
 package com.ozan.kotlinaiwork.screens
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -44,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +60,7 @@ import androidx.navigation.NavHostController
 import com.ozan.kotlinaiwork.ui.components.FormTextField
 
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
+import kotlinx.coroutines.launch
 
 @Immutable
 data class NestedTextField(
@@ -95,7 +98,6 @@ private fun updateItemInList(
 
 @Composable
 fun NestedTextFieldItem(
-    sharedViewModel: SharedViewModel= hiltViewModel(),
     item: NestedTextField,
     onAddChild: (NestedTextField) -> Unit,
     onTextChange: (NestedTextField, String) -> Unit,
@@ -239,7 +241,6 @@ fun ProjectDetail(
                     .padding(24.dp)
             )
 
-            // Main items list
             items.forEach { item ->
                 Card(
                     modifier = Modifier
@@ -278,47 +279,74 @@ fun ProjectDetail(
             }
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(onClick = {
+            val coroutineScope = rememberCoroutineScope()
 
-                val title=sharedViewModel.titleD
-                val description=sharedViewModel.descriptionD
-                val priority=sharedViewModel.priorityD
-
-                sharedViewModel.addProject(title,description,priority)
-
-                items.forEach { rootItem ->
-                    sharedViewModel.addBranch(rootItem.text)
-                }
-
-
-                sharedViewModel.project.value?.id?.let { projectId ->
-                    items.forEach { rootItem ->
-
-                        rootItem.children.forEach { childItem ->
-                            sharedViewModel.addTask(
-                                projectId = projectId,
-                                description = childItem.text,
-                                parentId = rootItem.id.toString()
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        try {
+                            val projectResult = sharedViewModel.addProject(
+                                title = sharedViewModel.title,
+                                description = sharedViewModel.description,
+                                priority = sharedViewModel.priority
                             )
 
+                            projectResult.onSuccess { project ->
+                                val projectId = project.id
 
-                            childItem.children.forEach { subChildItem ->
-                                sharedViewModel.addTask(
-                                    projectId = projectId,
-                                    description = subChildItem.text,
-                                    parentId = childItem.id.toString()
-                                )
+                                items.forEach { rootItem ->
+                                    val branchResult = sharedViewModel.addBranch(rootItem.text)
+
+                                    branchResult.onSuccess { branch ->
+                                        // Ana task (branch) ekleniyor
+                                        sharedViewModel.addTask(
+                                            projectId = projectId,
+                                            branchId = branch.id,  // branch.id zaten String
+                                            description = rootItem.text,
+                                            parentId = null  // Ana task olduğu için parentId null
+                                        )
+
+                                        // Alt task'lar ekleniyor
+                                        rootItem.children.forEach { childItem ->
+                                            sharedViewModel.addTask(
+                                                projectId = projectId,
+                                                branchId = branch.id,  // branch.id zaten String
+                                                description = childItem.text,
+                                                parentId = rootItem.id.toString()  // Int'i String'e çevir
+                                            )
+
+                                            // Alt-alt task'lar ekleniyor
+                                            childItem.children.forEach { subChildItem ->
+                                                sharedViewModel.addTask(
+                                                    projectId = projectId,
+                                                    branchId = branch.id,  // branch.id zaten String
+                                                    description = subChildItem.text,
+                                                    parentId = childItem.id.toString()  // Int'i String'e çevir
+                                                )
+                                            }
+                                        }
+                                    }.onFailure { e ->
+                                        Log.e("SaveProject", "Branch eklenirken hata: ${e.message}")
+                                    }
+                                }
+
+                                onSave()
+                            }.onFailure { e ->
+                                Log.e("SaveProject", "Proje kaydedilirken hata: ${e.message}")
                             }
+                        } catch (e: Exception) {
+                            Log.e("SaveProject", "Beklenmeyen hata: ${e.message}")
                         }
                     }
-                }
-
-
-            },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 16.dp)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp, horizontal = 16.dp)
             ) {
                 Text("Kaydet")
             }
+
+
         }
     }
 }

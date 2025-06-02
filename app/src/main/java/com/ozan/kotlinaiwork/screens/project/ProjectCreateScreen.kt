@@ -15,13 +15,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 import androidx.navigation.NavHostController
 import com.ozan.kotlinaiwork.ui.components.FormDropdownField
-import com.ozan.kotlinaiwork.ui.components.FormTextField
 
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectEditScreen(
+fun ProjectCreateScreen(
     sharedViewModel: SharedViewModel= hiltViewModel(),
 
     onBack: () -> Unit,
@@ -129,9 +128,9 @@ fun ProjectEditScreen(
 
             Button(onClick = {
                 sharedViewModel.saveProjectData(
-                    title = title,
-                    description = description,
-                    priority = priority.toInt(),
+                    titleD = title,
+                    descriptionD = description,
+                    priorityD = priority.toIntOrNull() ?: 0,
                 )
                 navController.navigate("project_detail")
                 },

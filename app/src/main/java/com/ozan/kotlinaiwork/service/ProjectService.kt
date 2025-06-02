@@ -6,17 +6,15 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Proje verileri için repository arayüzü
- */
 
 @Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val projectDao: ProjectDao,
 ) {
 
-    suspend fun insert(project: Project) {
+    suspend fun insert(project: Project): String {
         projectDao.insert(project)
+        return project.id
     }
 
     suspend fun update(project: Project) {
@@ -24,8 +22,7 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     suspend fun delete(project: Project) {
-        // İlk olarak projeye ait tüm görevleri sil
-        // Sonra projeyi sil
+
         projectDao.delete(project)
     }
 
@@ -51,5 +48,4 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 }
 
-// ProjectDao'ya ek metodlar
 fun ProjectDao.getProjectByIdAsFlow(projectId: String): Flow<Project?> = getByIdAsFlow(projectId)
