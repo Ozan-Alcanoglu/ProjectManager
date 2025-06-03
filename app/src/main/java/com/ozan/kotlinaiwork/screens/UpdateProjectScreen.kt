@@ -20,15 +20,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ozan.kotlinaiwork.model.Task
-import com.ozan.kotlinaiwork.service.TaskService
 import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
+import kotlinx.coroutines.flow.forEach
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +40,7 @@ fun UpdateProject(
     projectViewModel: ProjectViewModel= hiltViewModel()
 ){
 
-    val tasks = projectViewModel.tasks.value
+    val tasks by projectViewModel.tasks.collectAsState()
 
 
     Scaffold(
@@ -119,6 +120,7 @@ fun UpdateProject(
                     )
                 }
             }
+
         }
 
     }
