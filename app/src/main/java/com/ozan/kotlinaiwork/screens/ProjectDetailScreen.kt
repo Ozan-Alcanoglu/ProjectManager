@@ -1,6 +1,5 @@
 package com.ozan.kotlinaiwork.screens
 
-import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -141,7 +140,6 @@ fun NestedTextFieldItem(
                 singleLine = true
             )
 
-            // Add child button
             IconButton(
                 onClick = { onAddChild(item) },
                 modifier = Modifier
@@ -301,7 +299,7 @@ fun ProjectDetail(
                                         val mainTaskResult = sharedViewModel.addTask(
                                             projectId = projectId,
                                             branchId = branch.id,
-                                            description = rootItem.text,
+                                            taskname = rootItem.text,
                                             parentId = null
                                         )
 
@@ -310,7 +308,7 @@ fun ProjectDetail(
                                                 val childTaskResult = sharedViewModel.addTask(
                                                     projectId = projectId,
                                                     branchId = branch.id,
-                                                    description = childItem.text,
+                                                    taskname = childItem.text,
                                                     parentId = mainTask.id
                                                 )
 
@@ -319,7 +317,7 @@ fun ProjectDetail(
                                                         sharedViewModel.addTask(
                                                             projectId = projectId,
                                                             branchId = branch.id,
-                                                            description = subChildItem.text,
+                                                            taskname = subChildItem.text,
                                                             parentId = childTask.id
                                                         )
                                                     }

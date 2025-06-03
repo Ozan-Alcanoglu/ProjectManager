@@ -8,13 +8,17 @@ import javax.inject.Singleton
 
 
 @Singleton
-class ProjectRepositoryImpl @Inject constructor(
+class ProjectService @Inject constructor(
     private val projectDao: ProjectDao,
 ) {
 
     suspend fun insert(project: Project): String {
         projectDao.insert(project)
         return project.id
+    }
+
+    suspend fun getAll(): List<Project>{
+        return projectDao.getAll()
     }
 
     suspend fun update(project: Project) {

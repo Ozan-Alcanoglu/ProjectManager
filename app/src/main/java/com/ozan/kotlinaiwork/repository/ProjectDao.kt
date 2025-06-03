@@ -17,7 +17,8 @@ interface ProjectDao {
     @Query("SELECT * FROM projects WHERE id = :id")
     fun getByIdAsFlow(id: String): Flow<Project?>
 
-
+    @Query("SELECT * FROM projects")
+    suspend fun getAll(): List<Project>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(project: Project)

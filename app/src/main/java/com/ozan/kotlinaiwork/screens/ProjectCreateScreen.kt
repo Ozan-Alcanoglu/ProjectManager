@@ -1,4 +1,4 @@
-package com.ozan.kotlinaiwork.screens.project
+package com.ozan.kotlinaiwork.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

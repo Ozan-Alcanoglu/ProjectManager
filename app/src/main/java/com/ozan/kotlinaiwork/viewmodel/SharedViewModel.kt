@@ -4,26 +4,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ozan.kotlinaiwork.model.Branch
 import com.ozan.kotlinaiwork.model.Project
 import com.ozan.kotlinaiwork.model.Task
 import com.ozan.kotlinaiwork.screens.NestedTextField
 import com.ozan.kotlinaiwork.service.BranchService
-import com.ozan.kotlinaiwork.service.ProjectRepositoryImpl
+import com.ozan.kotlinaiwork.service.ProjectService
 import com.ozan.kotlinaiwork.service.TaskService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     private val taskService: TaskService,
     private val branchService: BranchService,
-    private val projectService: ProjectRepositoryImpl
+    private val projectService: ProjectService
 ) : ViewModel() {
 
     private var itemIdCounter = 0
@@ -104,11 +101,11 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    suspend fun addTask(projectId: String,branchId:String, description: String, parentId: String? = null): Result<Task> {
+    suspend fun addTask(projectId: String,branchId:String, taskname: String, parentId: String? = null): Result<Task> {
         return try {
             val task = Task(
                 branchId=branchId,
-                description = description,
+                taskname = taskname,
                 projectId = projectId,
                 parentId = parentId
             )

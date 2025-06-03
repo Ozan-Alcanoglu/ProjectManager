@@ -34,11 +34,13 @@ data class Task(
     val id:String=UUID.randomUUID().toString(),
     val branchId: String? = null,
 
-    val description: String? = null,
+    val taskname: String? = null,
 
     val projectId: String,
 
     val parentId: String? = null,
+
+    val isDone:Boolean=false,
 
     @ColumnInfo(name = "sort_order")
     val sortOrder: Int = 0

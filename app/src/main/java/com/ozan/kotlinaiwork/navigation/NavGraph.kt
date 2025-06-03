@@ -9,13 +9,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ozan.kotlinaiwork.screens.ProjectListScreen
 import com.ozan.kotlinaiwork.screens.ProjectDetail
-import com.ozan.kotlinaiwork.screens.project.ProjectCreateScreen
+import com.ozan.kotlinaiwork.screens.ProjectCreateScreen
+import com.ozan.kotlinaiwork.screens.UpdateProject
+import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
 
 
 sealed class Screen(val route: String) {
     object ProjectList : Screen("project_list")
     object ProjectDetail : Screen("project_detail")
+    object UpdateProject : Screen("update_project")
     object AddProject : Screen("add_project")
     object EditProject : Screen("edit_project/{projectId}") {
         fun createRoute(projectId: String) = "edit_project/$projectId"
@@ -33,6 +36,7 @@ fun NavGraph(
 ) {
 
     val sharedViewModel: SharedViewModel = hiltViewModel()
+    val projectViewModel: ProjectViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -45,6 +49,8 @@ fun NavGraph(
                         launchSingleTop = true
                     }
                 },
+                sharedViewModel = sharedViewModel,
+                projectViewModel = projectViewModel
             )
         }
 
@@ -61,7 +67,12 @@ fun NavGraph(
             ProjectDetail(
                 sharedViewModel=sharedViewModel,
                 onBack = { navController.navigateUp() },
-                onSave = { navController.navigateUp() },
+                onSave = {
+                    navController.navigate(Screen.ProjectList.route) {
+                        popUpTo(Screen.ProjectList.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
                 navController = navController)
         }
 
@@ -83,6 +94,13 @@ fun NavGraph(
                 navController = navController
             )
         }
+
+        composable(Screen.UpdateProject.route) {
+            UpdateProject(
+                projectViewModel = projectViewModel
+            )
+        }
+
     }
 }
 
