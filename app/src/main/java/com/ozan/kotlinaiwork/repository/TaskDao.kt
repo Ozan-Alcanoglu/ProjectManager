@@ -18,13 +18,16 @@ interface TaskDao {
     suspend fun updateTask(task: Task)
 
 
+    @Query("SELECT * FROM project_items WHERE projectId= :id")
+    suspend fun loadTasksByProejctId(id:String):List<Task>
+
     @Delete
     suspend fun deleteTask(task: Task)
 
 
     @Query("DELETE FROM project_items WHERE projectId = :projectId")
     suspend fun deleteAllTasksForProject(projectId: String)
-    
+
     @Query("SELECT * FROM project_items WHERE projectId = :projectId")
     suspend fun getTasksByProject(projectId: String): List<Task>
 

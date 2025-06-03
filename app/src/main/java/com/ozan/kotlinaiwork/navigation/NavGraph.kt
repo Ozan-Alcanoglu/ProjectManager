@@ -7,10 +7,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.ozan.kotlinaiwork.repository.TaskDao
 import com.ozan.kotlinaiwork.screens.ProjectListScreen
 import com.ozan.kotlinaiwork.screens.ProjectDetail
 import com.ozan.kotlinaiwork.screens.ProjectCreateScreen
 import com.ozan.kotlinaiwork.screens.UpdateProject
+import com.ozan.kotlinaiwork.service.TaskService
 import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
 
@@ -97,7 +99,8 @@ fun NavGraph(
 
         composable(Screen.UpdateProject.route) {
             UpdateProject(
-                projectViewModel = projectViewModel
+                onBack = {navController.navigateUp()},
+                projectViewModel = projectViewModel,
             )
         }
 
