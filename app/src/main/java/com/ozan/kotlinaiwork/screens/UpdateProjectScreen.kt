@@ -1,49 +1,28 @@
 package com.ozan.kotlinaiwork.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
 import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Button
-import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -57,6 +36,9 @@ fun UpdateProject(
     val tasks by projectViewModel.tasks.collectAsState()
     val checkboxStates = remember { mutableStateMapOf<String, Boolean>() }
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -74,7 +56,7 @@ fun UpdateProject(
                 actions = {
                     IconButton(
                         onClick = {
-                            // Yeni task ekleme işlemi yapılabilir
+                            showDeleteDialog = true
                         },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
@@ -92,6 +74,35 @@ fun UpdateProject(
             )
         }
     ) { padding ->
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text(text = "Projeyi Sil") },
+                text = { Text("Projeyi silmek istediğinize emin misiniz?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            projectViewModel.currentProject?.id?.let { id ->
+                                projectViewModel.deleteProjectById(id)
+                                projectViewModel.deleteAllTasksForProject(id)
+                            }
+                            showDeleteDialog = false
+                            onBack()
+                        }
+                    ) {
+                        Text("Evet")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showDeleteDialog = false }
+                    ) {
+                        Text("Hayır")
+                    }
+                }
+            )
+        }
 
         LaunchedEffect(projectViewModel.currentProject?.id) {
             projectViewModel.currentProject?.id?.let { id ->
@@ -115,11 +126,39 @@ fun UpdateProject(
                 )
             }
 
+            projectViewModel.currentProject?.priority?.let { priority ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Önem seviyesi: " + when (priority) {
+                            2 -> "YÜKSEK"
+                            1 -> "ORTA"
+                            else -> "DÜŞÜK"
+                        },
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(start = 12.dp, top = 10.dp)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                when (priority) {
+                                    2 -> Color(0xFFFF6B6B)
+                                    1 -> Color(0xFFFFD166)
+                                    else -> Color(0xFF06D6A0)
+                                }
+                            )
+                            .padding(14.dp)
+                    )
+                }
+            }
+
             projectViewModel.currentProject?.description?.let { description ->
                 Text(
                     text = "-$description",
                     fontSize = 25.sp,
-                    modifier = Modifier.padding(start = 12.dp, top = 16.dp)
+                    modifier = Modifier.padding(start = 12.dp, top = 20.dp)
                 )
             }
 
@@ -188,6 +227,7 @@ fun UpdateProject(
 
             Button(
                 onClick = {
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()

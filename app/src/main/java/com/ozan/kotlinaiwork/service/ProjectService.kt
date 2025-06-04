@@ -30,6 +30,11 @@ class ProjectService @Inject constructor(
         projectDao.delete(project)
     }
 
+    suspend fun deleteById(id: String) {
+
+        projectDao.deleteById(id)
+    }
+
     suspend fun getById(id: String): Project? {
         return projectDao.getById(id)
     }

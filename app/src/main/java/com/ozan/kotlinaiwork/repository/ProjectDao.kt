@@ -32,6 +32,9 @@ interface ProjectDao {
     @Query("DELETE FROM projects")
     suspend fun deleteAll()
 
+    @Query("DELETE FROM projects WHERE id= :id")
+    suspend fun deleteById(id:String)
+
     @Query("SELECT * FROM projects WHERE title LIKE :query OR description LIKE :query")
     fun search(query: String): Flow<List<Project>>
 

@@ -66,4 +66,26 @@ class ProjectViewModel @Inject constructor(
         }
     }
 
+    fun deleteProjectById(id:String){
+        viewModelScope.launch {
+            try {
+                projectService.deleteById(id)
+            }
+            catch (e:Exception){
+                Log.e("ProjectViewmodel","projeyi silerken hata oldu: {e}",e)
+            }
+        }
+    }
+
+    fun deleteAllTasksForProject(id: String){
+        viewModelScope.launch {
+            try {
+                taskService.deleteAllTasksForProject(id)
+            }
+            catch (e:Exception){
+                Log.e("ProjectViewmodel","taskları silerken hata oldu: {e}",e)
+            }
+        }
+    }
+
 }

@@ -35,6 +35,10 @@ class TaskService @Inject constructor(
         return taskDao.getTasksByProject(projectId)
     }
 
+    suspend fun deleteAllTasksForProject(projectId: String){
+        return taskDao.deleteAllTasksForProject(projectId)
+    }
+
     suspend fun loadTasksByProejctId(id:String):List<Task>{
         return taskDao.loadTasksByProejctId(id)
     }
