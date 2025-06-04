@@ -32,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -112,7 +113,7 @@ fun NestedTextFieldItem(
                     contentDescription = "Child item indicator",
                     tint = MaterialTheme.colorScheme.outline,
                     modifier = Modifier
-                        .size(16.dp)
+                        .size(64.dp)
                         .align(Alignment.Center)
                 )
             }
@@ -134,19 +135,23 @@ fun NestedTextFieldItem(
                 singleLine = true
             )
 
-            IconButton(
-                onClick = { onAddChild(item) },
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.3f))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add child",
-                    tint = Color.Black,
-                    modifier = Modifier.size(16.dp)
-                )
+            if (level == 0) {
+                IconButton(
+                    onClick = { onAddChild(item) },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.3f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add child",
+                        tint = Color.Black,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.size(32.dp))
             }
         }
 
@@ -174,6 +179,10 @@ fun ProjectDetail(
 ) {
     var counter by remember { mutableStateOf(0) }
 
+    LaunchedEffect (Unit) {
+        sharedViewModel.updateItems(emptyList())
+        counter = 0
+    }
 
     val scrollState = rememberScrollState()
     val items by sharedViewModel.nestedTextFields.collectAsState()
