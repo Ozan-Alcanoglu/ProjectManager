@@ -15,26 +15,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ozan.kotlinaiwork.model.Project
 import com.ozan.kotlinaiwork.viewmodel.ProjectViewModel
-import com.ozan.kotlinaiwork.viewmodel.SharedViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectListScreen(
     onNavigate: (String) -> Unit,
-    sharedViewModel: SharedViewModel = hiltViewModel(),
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
+    var priorityFilter by remember { mutableStateOf<String?>(null) }
+    var dateFilter by remember { mutableStateOf<String?>(null) }
 
     val projectList by projectViewModel.projects.collectAsState()
+    val projectTaskCompletion by projectViewModel.projectTaskCompletion.collectAsState()
 
-    LaunchedEffect(Unit) {
-        projectViewModel.loadProjects()
+    LaunchedEffect(priorityFilter, dateFilter) {
+        val priorityDesc = when (priorityFilter) {
+            "Yüksek" -> true
+            "Düşük" -> false
+            else -> null
+        }
+
+        val dateDesc = when (dateFilter) {
+            "Yeni" -> true
+            "Eski" -> false
+            else -> null
+        }
+
+        if (priorityDesc != null && dateDesc != null) {
+            projectViewModel.loadProjectsSorted(priorityDesc, dateDesc)
+        } else if (priorityDesc != null) {
+            if (priorityDesc) projectViewModel.loadProjectsByPriorityDesc()
+            else projectViewModel.loadProjectsByPriorityAsc()
+        } else if (dateDesc != null) {
+            if (dateDesc) projectViewModel.loadProjectsByDateDesc()
+            else projectViewModel.loadProjectsByDateAsc()
+        } else {
+            projectViewModel.loadProjects()
+        }
     }
 
     Scaffold(
@@ -54,12 +79,23 @@ fun ProjectListScreen(
             )
         }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .background(Color(0xFFF5F5F5))
         ) {
+            FilterSection(
+                priorityFilter = priorityFilter,
+                onPrioritySelected = { priorityFilter = it },
+                dateFilter = dateFilter,
+                onDateSelected = { dateFilter = it },
+                onReset = {
+                    priorityFilter = null
+                    dateFilter = null
+                }
+            )
+
             if (projectList.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -68,11 +104,7 @@ fun ProjectListScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        "Henüz proje bulunmuyor",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Gray
-                    )
+                    Text("Henüz proje bulunmuyor", style = MaterialTheme.typography.titleMedium, color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "Sağ üstteki + butonuna basarak yeni proje oluşturabilirsiniz",
@@ -89,8 +121,12 @@ fun ProjectListScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(projectList) { project ->
+                        val (done, total) = projectTaskCompletion[project.id] ?: (0 to 0)
+                        val percentage = if (total > 0) (done * 100) / total else 0
+
                         ProjectCard(
                             project = project,
+                            completionPercentage = percentage,
                             onProjectClick = {
                                 projectViewModel.showProject(project.id)
                                 onNavigate("update_project")
@@ -103,11 +139,88 @@ fun ProjectListScreen(
     }
 }
 
+@Composable
+fun FilterSection(
+    priorityFilter: String?,
+    onPrioritySelected: (String?) -> Unit,
+    dateFilter: String?,
+    onDateSelected: (String?) -> Unit,
+    onReset: () -> Unit
+) {
+    var priorityExpanded by remember { mutableStateOf(false) }
+    var dateExpanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+            Box {
+                Text(
+                    text = "Öncelik: ${priorityFilter ?: "-"}",
+                    modifier = Modifier
+                        .clickable { priorityExpanded = true }
+                        .padding(8.dp)
+                        .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    color = Color.Black
+                )
+                DropdownMenu(
+                    expanded = priorityExpanded,
+                    onDismissRequest = { priorityExpanded = false }
+                ) {
+                    DropdownMenuItem(text = { Text("Yüksek") }, onClick = {
+                        onPrioritySelected("Yüksek")
+                        priorityExpanded = false
+                    })
+                    DropdownMenuItem(text = { Text("Düşük") }, onClick = {
+                        onPrioritySelected("Düşük")
+                        priorityExpanded = false
+                    })
+                }
+            }
+
+            Box {
+                Text(
+                    text = "Tarih: ${dateFilter ?: "-"}",
+                    modifier = Modifier
+                        .clickable { dateExpanded = true }
+                        .padding(8.dp)
+                        .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    color = Color.Black
+                )
+                DropdownMenu(
+                    expanded = dateExpanded,
+                    onDismissRequest = { dateExpanded = false }
+                ) {
+                    DropdownMenuItem(text = { Text("Yeni") }, onClick = {
+                        onDateSelected("Yeni")
+                        dateExpanded = false
+                    })
+                    DropdownMenuItem(text = { Text("Eski") }, onClick = {
+                        onDateSelected("Eski")
+                        dateExpanded = false
+                    })
+                }
+            }
+        }
+
+        TextButton(onClick = onReset) {
+            Text("Filtreyi Sıfırla")
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectCard(
     project: Project,
+    completionPercentage: Int = 0,
     onProjectClick: () -> Unit
 ) {
     Card(
@@ -120,57 +233,81 @@ fun ProjectCard(
             containerColor = Color.White
         )
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = project.title,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                ),
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (!project.description.isNullOrBlank()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        when (project.priority) {
+                            2 -> Color(0xFFFF6B6B)
+                            1 -> Color(0xFFFFD166)
+                            else -> Color(0xFF06D6A0)
+                        }
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
                 Text(
-                    text = project.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    maxLines = 2,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    text = when (project.priority) {
+                        2 -> "Yüksek"
+                        1 -> "Orta"
+                        else -> "Düşük"
+                    },
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 8.dp)
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(
-                            when (project.priority) {
-                                2 -> Color(0xFFFF6B6B)
-                                1 -> Color(0xFFFFD166)
-                                else -> Color(0xFF06D6A0)
-                            }
-                        )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = when (project.priority) {
-                        2 -> "Yüksek Öncelikli"
-                        1 -> "Orta Öncelikli"
-                        else -> "Düşük Öncelikli"
-                    },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Color.Gray
+                    text = project.title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    color = Color.Black,
+                    maxLines = 2
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (!project.description.isNullOrBlank()) {
+                    Text(
+                        text = project.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        maxLines = 2,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
+                Text(
+                    text = "Tamamlanma: $completionPercentage%",
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = Color(0xFF2196F3),
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
+
+            project.createdAt?.let { createdAt ->
+                val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                val formattedDate = formatter.format(createdAt)
+
+                Text(
+                    text = "Oluşturulma: $formattedDate",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.DarkGray,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(top = 8.dp)
                 )
             }
         }

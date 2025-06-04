@@ -1,6 +1,7 @@
 package com.ozan.kotlinaiwork.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -110,6 +113,15 @@ fun UpdateProject(
             }
         }
 
+        LaunchedEffect(tasks) {
+            tasks.forEach { task ->
+                task.id?.let { taskId ->
+                    checkboxStates[taskId] = task.isDone == true
+                }
+            }
+        }
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -120,8 +132,8 @@ fun UpdateProject(
             projectViewModel.currentProject?.title?.let { title ->
                 Text(
                     text = title,
-                    fontSize = 45.sp,
-                    fontStyle = FontStyle.Italic,
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 12.dp, top = 20.dp)
                 )
             }
@@ -158,7 +170,7 @@ fun UpdateProject(
                 Text(
                     text = "-$description",
                     fontSize = 25.sp,
-                    modifier = Modifier.padding(start = 12.dp, top = 20.dp)
+                    modifier = Modifier.padding(start = 12.dp, top = 30.dp)
                 )
             }
 
@@ -225,9 +237,20 @@ fun UpdateProject(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            val context = LocalContext.current
+
             Button(
                 onClick = {
-
+                    coroutineScope.launch {
+                        try {
+                            checkboxStates.forEach { (taskId, isDone) ->
+                                projectViewModel.updateTaskIsDone(taskId, isDone)
+                            }
+                            Toast.makeText(context, "Proje güncellendi", Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Hata oluştu: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -235,6 +258,7 @@ fun UpdateProject(
             ) {
                 Text("Kaydet")
             }
+
         }
     }
 }

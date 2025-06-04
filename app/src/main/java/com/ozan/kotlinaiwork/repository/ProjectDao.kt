@@ -20,6 +20,30 @@ interface ProjectDao {
     @Query("SELECT * FROM projects")
     suspend fun getAll(): List<Project>
 
+    @Query("SELECT * FROM projects ORDER BY priority DESC")
+    suspend fun getAllByPriorityDesc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY priority ASC")
+    suspend fun getAllByPriorityAsc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY createdAt DESC")
+    suspend fun getAllByDateDesc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY createdAt ASC")
+    suspend fun getAllByDateAsc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY priority DESC, createdAt DESC")
+    suspend fun getByPriorityDescDateDesc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY priority DESC, createdAt ASC")
+    suspend fun getByPriorityDescDateAsc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY priority ASC, createdAt DESC")
+    suspend fun getByPriorityAscDateDesc(): List<Project>
+
+    @Query("SELECT * FROM projects ORDER BY priority ASC, createdAt ASC")
+    suspend fun getByPriorityAscDateAsc(): List<Project>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(project: Project)
 

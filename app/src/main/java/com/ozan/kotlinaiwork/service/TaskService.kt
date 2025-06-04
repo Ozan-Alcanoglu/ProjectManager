@@ -43,5 +43,9 @@ class TaskService @Inject constructor(
         return taskDao.loadTasksByProejctId(id)
     }
 
+    suspend fun updateTaskIsDone(taskId: String, isDone: Boolean){
+        taskDao.updateTaskIsDone(taskId, isDone)
+    }
+
 
 }

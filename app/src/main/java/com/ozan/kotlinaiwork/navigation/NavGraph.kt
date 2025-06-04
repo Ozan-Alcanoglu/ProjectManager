@@ -51,7 +51,6 @@ fun NavGraph(
                         launchSingleTop = true
                     }
                 },
-                sharedViewModel = sharedViewModel,
                 projectViewModel = projectViewModel
             )
         }

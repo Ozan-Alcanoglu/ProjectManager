@@ -21,6 +21,22 @@ class ProjectService @Inject constructor(
         return projectDao.getAll()
     }
 
+    suspend fun getAllByPriorityDesc() : List<Project>{
+        return projectDao.getAllByPriorityDesc()
+    }
+
+    suspend fun getAllByPriorityAsc() : List<Project>{
+        return projectDao.getAllByPriorityAsc()
+    }
+
+    suspend fun getAllByDateDesc(): List<Project>{
+        return projectDao.getAllByDateDesc()
+    }
+
+    suspend fun getAllByDateAsc(): List<Project>{
+        return projectDao.getAllByDateAsc()
+    }
+
     suspend fun update(project: Project) {
         projectDao.update(project)
     }
@@ -54,6 +70,18 @@ class ProjectService @Inject constructor(
 
     fun getProgress(projectId: String): Flow<Float> {
         TODO()
+    }
+
+    suspend fun getProjectsSorted(
+        priorityDesc: Boolean,
+        dateDesc: Boolean
+    ): List<Project> {
+        return when {
+            priorityDesc && dateDesc -> projectDao.getByPriorityDescDateDesc()
+            priorityDesc && !dateDesc -> projectDao.getByPriorityDescDateAsc()
+            !priorityDesc && dateDesc -> projectDao.getByPriorityAscDateDesc()
+            else -> projectDao.getByPriorityAscDateAsc()
+        }
     }
 }
 
