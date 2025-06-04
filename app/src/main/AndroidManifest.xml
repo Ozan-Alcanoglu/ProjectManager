@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name="com.ozan.kotlinaiwork.HobbyProjectApplication"
+        android:name="com.ozan.kotlintodoproject.ProjectApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,7 +18,7 @@
         android:theme="@style/Theme.KotlinAıWork"
         tools:targetApi="31">
         <activity
-            android:name="com.ozan.kotlinaiwork.MainActivity"
+            android:name="com.ozan.kotlintodoproject.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:label="@string/app_name"
