@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -126,6 +128,8 @@ fun NestedTextFieldItem(
             }
         }
 
+        val labelText = if (level == 0) "Ana Görev" else "Alt Görev"
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -133,7 +137,7 @@ fun NestedTextFieldItem(
             FormTextField(
                 value = item.text,
                 onValueChange = { onTextChange(item, it) },
-                label = "Başlık",
+                label = labelText,
                 modifier = Modifier
                     .weight(1f)
                     .padding(8.dp),
@@ -181,7 +185,7 @@ fun ProjectDetail(
     var counter by remember { mutableStateOf(0) }
 
 
-
+    val scrollState = rememberScrollState()
     val items by sharedViewModel.nestedTextFields.collectAsState()
 //
 //
@@ -197,7 +201,8 @@ fun ProjectDetail(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "İptal"
+                            contentDescription = "Geri",
+                            tint = Color.White
                         )
                     }
                 },
@@ -228,6 +233,7 @@ fun ProjectDetail(
                 .fillMaxSize()
                 .background(color = Color.White)
                 .padding(padding)
+                .verticalScroll(scrollState)
         ) {
             Text(
                 text = "Projenizin adımlarınızı belirleyiniz",
@@ -243,7 +249,7 @@ fun ProjectDetail(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
                         .border(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),

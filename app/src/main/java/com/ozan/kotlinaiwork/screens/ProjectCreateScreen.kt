@@ -43,7 +43,8 @@ fun ProjectCreateScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "İptal"
+                            contentDescription = "Geri",
+                            tint = Color.White
                         )
                     }
                 },
