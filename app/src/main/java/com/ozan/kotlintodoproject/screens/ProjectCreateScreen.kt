@@ -49,7 +49,7 @@ fun ProjectCreateScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color(0xFF16CF00), // Light green color
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )
@@ -136,7 +136,8 @@ fun ProjectCreateScreen(
                 navController.navigate("project_detail")
                 },
                 enabled = isFormValid,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16CF00))
             ) {
                 Text("Devam Et")
             }

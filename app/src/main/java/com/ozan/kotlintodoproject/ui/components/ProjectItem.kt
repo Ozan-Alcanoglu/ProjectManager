@@ -126,7 +126,7 @@ fun ProjectItem(
             Text(
                 text = "${(project.progress * 100).toInt()}% Tamamlandı",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = Color(0xFF76FF03) // Light green color
             )
         }
     }

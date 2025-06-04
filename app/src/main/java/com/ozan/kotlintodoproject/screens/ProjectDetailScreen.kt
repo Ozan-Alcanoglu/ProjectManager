@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -220,7 +221,7 @@ fun ProjectDetail(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color(0xFF16CF00), // Light green color
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )
@@ -345,7 +346,8 @@ fun ProjectDetail(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 16.dp)
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16CF00))
             ) {
                 Text("Kaydet")
             }

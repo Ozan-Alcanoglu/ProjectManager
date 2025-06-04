@@ -61,7 +61,7 @@ fun UpdateProjectDetail(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color(0xFF76FF03), // Light green color
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )

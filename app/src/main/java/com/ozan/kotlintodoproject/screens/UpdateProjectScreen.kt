@@ -69,7 +69,7 @@ fun UpdateProject(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color(0xFF16CF00), // Light green color
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )
@@ -155,9 +155,9 @@ fun UpdateProject(
                             .clip(RoundedCornerShape(4.dp))
                             .background(
                                 when (priority) {
-                                    2 -> Color(0xFFFF6B6B)
+                                    2 -> Color(0xFFD21400)
                                     1 -> Color(0xFFFFD166)
-                                    else -> Color(0xFF06D6A0)
+                                    else -> Color(0xFF76FF03)
                                 }
                             )
                             .padding(14.dp)
@@ -253,7 +253,9 @@ fun UpdateProject(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 16.dp)
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16CF00))
+
             ) {
                 Text("Kaydet")
             }

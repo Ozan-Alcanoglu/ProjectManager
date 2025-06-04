@@ -72,7 +72,7 @@ fun ProjectListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color(0xFF16CF00), // Light green color
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )
@@ -244,9 +244,9 @@ fun ProjectCard(
                     .clip(RoundedCornerShape(8.dp))
                     .background(
                         when (project.priority) {
-                            2 -> Color(0xFFFF6B6B)
+                            2 -> Color(0xFFD21400)
                             1 -> Color(0xFFFFD166)
-                            else -> Color(0xFF06D6A0)
+                            else -> Color(0xFF76FF03)
                         }
                     )
                     .padding(horizontal = 8.dp, vertical = 4.dp)
