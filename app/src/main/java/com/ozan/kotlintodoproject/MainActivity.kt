@@ -11,15 +11,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.ozan.kotlintodoproject.navigation.NavGraph
 import com.ozan.kotlintodoproject.ui.theme.KotlinAıWorkTheme
+import com.ozan.kotlintodoproject.worker.NotificationWorker
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val request = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.DAYS)
+            .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "project_notification_worker",
+                ExistingPeriodicWorkPolicy.KEEP,
+                request
+            )
 
 
         setContent {

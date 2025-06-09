@@ -1,59 +1,76 @@
+package com.ozan.kotlintodoproject.worker
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.ozan.kotlintodoproject.model.Project
 import com.ozan.kotlintodoproject.service.ProjectService
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import kotlinx.coroutines.coroutineScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
-class NotificationWorker(
-    @ApplicationContext private val context: Context,
-    workerParams: WorkerParameters,
-    private val service: ProjectService
+@HiltWorker
+class NotificationWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val projectService: ProjectService
 ) : CoroutineWorker(context, workerParams) {
 
-    override suspend fun doWork(): Result = coroutineScope {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            val projects = service.getAllProjects() // Tüm projeleri çek
+            val allProjects = projectService.getAll()
 
-            projects.forEach { project ->
-                val priority = project.priority
-                val shouldSendNotification = when (priority) {
-                    2 -> true  // Yüksek öncelik - her gün
-                    1 -> false // Orta öncelik - 3 günde 1
-                    0 -> false // Düşük öncelik - haftalık
+            allProjects.forEach { project ->
+                val shouldNotify = when (project.priority) {
+                    2 -> true
+                    1 -> {
+                        val now = System.currentTimeMillis()
+                        now % TimeUnit.DAYS.toMillis(3) < TimeUnit.MINUTES.toMillis(15)
+                    }
+                    0 -> {
+                        val now = System.currentTimeMillis()
+                        now % TimeUnit.SECONDS.toMillis(10) < TimeUnit.SECONDS.toMillis(5)
+                    }
                     else -> false
                 }
 
-                if (shouldSendNotification) {
-                    sendNotification(project)
+                if (shouldNotify) {
+                    sendNotification("Projelerim", "${project.title} projesi için bildirim zamanı!")
                 }
             }
 
             Result.success()
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure()
         }
     }
 
-    private fun sendNotification(project: Project) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "project_notifications"
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Projeler", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
+    private fun sendNotification(title: String, message: String) {
+        val channelId = "project_channel"
+        val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Project Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            manager.createNotificationChannel(channel)
         }
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("Proje Hatırlatma")
-            .setContentText("${project.title} projesi için hatırlatma zamanı.")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+        val notification = NotificationCompat.Builder(applicationContext, channelId)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
-        notificationManager.notify(project.id, notification)
+        manager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }

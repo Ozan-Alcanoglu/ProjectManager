@@ -121,7 +121,7 @@ fun ProjectListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF16CF00),
+                    containerColor = Color(0xFF00E0CC),
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )

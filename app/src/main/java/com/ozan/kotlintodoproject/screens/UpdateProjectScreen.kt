@@ -69,7 +69,7 @@ fun UpdateProject(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF16CF00), // Light green color
+                    containerColor = Color(0xFF00E0CC),
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )
@@ -254,7 +254,7 @@ fun UpdateProject(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16CF00))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E0CC))
 
             ) {
                 Text("Kaydet")
