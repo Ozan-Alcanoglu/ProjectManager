@@ -1,5 +1,10 @@
 package com.ozan.kotlintodoproject.screens
 
+import android.Manifest
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,12 +13,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -30,6 +37,33 @@ fun ProjectListScreen(
     onNavigate: (String) -> Unit,
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            } else true
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasNotificationPermission = isGranted
+        if (!isGranted) {
+            Toast.makeText(context, "Bildirim izni reddedildi", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Bildirim izni verildi", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     var priorityFilter by remember { mutableStateOf<String?>(null) }
     var dateFilter by remember { mutableStateOf<String?>(null) }
 
@@ -67,24 +101,53 @@ fun ProjectListScreen(
             TopAppBar(
                 title = { Text("Projelerim") },
                 actions = {
+                    IconButton(onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (!hasNotificationPermission) {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                Toast.makeText(context, "Bildirim izni zaten verilmiş", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Bildirim İkonu",
+                            tint = Color.White
+                        )
+                    }
                     IconButton(onClick = { onNavigate("add_project") }) {
                         Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF16CF00), // Light green color
+                    containerColor = Color(0xFF16CF00),
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 )
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .background(Color(0xFFF5F5F5))
         ) {
+            if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Text(
+                    text = "Hatırlatma için bildirim iznini açmalısınız.",
+                    color = Color.Red,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFCDD2))
+                        .padding(12.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             FilterSection(
                 priorityFilter = priorityFilter,
                 onPrioritySelected = { priorityFilter = it },

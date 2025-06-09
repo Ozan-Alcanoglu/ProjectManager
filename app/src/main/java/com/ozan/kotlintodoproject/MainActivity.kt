@@ -24,12 +24,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KotlinAıWorkTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HobbyProjectApp()
+                    ProjectApp()
                 }
             }
         }
@@ -39,7 +38,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HobbyProjectApp() {
+fun ProjectApp() {
     val navController = rememberNavController()
 
     NavGraph(navController = navController)
@@ -49,6 +48,6 @@ fun HobbyProjectApp() {
 @Composable
 fun AppPreview() {
     KotlinAıWorkTheme {
-        HobbyProjectApp()
+        ProjectApp()
     }
 }

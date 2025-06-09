@@ -48,6 +48,14 @@ android {
 }
 
 dependencies {
+
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // Hilt WorkManager entegrasyonu
+    implementation("androidx.hilt:hilt-work:1.1.0")
+    kapt("androidx.hilt:hilt-compiler:1.1.0")
+
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
