@@ -26,15 +26,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val request = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.DAYS)
-            .build()
+        val request = PeriodicWorkRequestBuilder<NotificationWorker>(
+            15,
+            TimeUnit.MINUTES,
+            5,
+            TimeUnit.MINUTES
+        ).build()
 
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
                 "project_notification_worker",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 request
             )
+
 
 
         setContent {

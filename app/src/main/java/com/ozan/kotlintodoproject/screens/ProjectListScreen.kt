@@ -1,6 +1,9 @@
 package com.ozan.kotlintodoproject.screens
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -25,7 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ozan.kotlintodoproject.ProjectApplication
 import com.ozan.kotlintodoproject.model.Project
 import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
 import java.text.SimpleDateFormat
@@ -97,6 +102,47 @@ fun ProjectListScreen(
     }
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    try {
+                        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                        
+                        // Android 8.0 ve üzeri için kanal oluştur
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            val channel = notificationManager.getNotificationChannel(ProjectApplication.NOTIFICATION_CHANNEL_ID)
+                            if (channel == null) {
+                                val newChannel = NotificationChannel(
+                                    ProjectApplication.NOTIFICATION_CHANNEL_ID,
+                                    "Proje Bildirimleri",
+                                    NotificationManager.IMPORTANCE_DEFAULT
+                                ).apply {
+                                    description = "Proje hatırlatıcıları için bildirim kanalı"
+                                }
+                                notificationManager.createNotificationChannel(newChannel)
+                            }
+                        }
+
+                        // Bildirimi oluştur
+                        val notification = NotificationCompat.Builder(context, ProjectApplication.NOTIFICATION_CHANNEL_ID)
+                            .setSmallIcon(android.R.drawable.ic_dialog_info)
+                            .setContentTitle("Test Bildirimi")
+                            .setContentText("Bu bir test bildirimidir!")
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setAutoCancel(true)
+                            .build()
+
+                        // Bildirimi göster
+                        notificationManager.notify(1, notification)
+                        Toast.makeText(context, "Bildirim gönderildi!", Toast.LENGTH_SHORT).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Hata: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            ) {
+                Icon(Icons.Default.Notifications, "Bildirim Testi")
+            }
+        },
         topBar = {
             TopAppBar(
                 title = { Text("Projelerim") },
@@ -119,6 +165,8 @@ fun ProjectListScreen(
                     IconButton(onClick = { onNavigate("add_project") }) {
                         Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle")
                     }
+
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF00E0CC),
