@@ -107,8 +107,7 @@ fun ProjectListScreen(
                 onClick = {
                     try {
                         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                        
-                        // Android 8.0 ve üzeri için kanal oluştur
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             val channel = notificationManager.getNotificationChannel(ProjectApplication.NOTIFICATION_CHANNEL_ID)
                             if (channel == null) {
@@ -123,7 +122,6 @@ fun ProjectListScreen(
                             }
                         }
 
-                        // Bildirimi oluştur
                         val notification = NotificationCompat.Builder(context, ProjectApplication.NOTIFICATION_CHANNEL_ID)
                             .setSmallIcon(android.R.drawable.ic_dialog_info)
                             .setContentTitle("Test Bildirimi")
@@ -132,7 +130,6 @@ fun ProjectListScreen(
                             .setAutoCancel(true)
                             .build()
 
-                        // Bildirimi göster
                         notificationManager.notify(1, notification)
                         Toast.makeText(context, "Bildirim gönderildi!", Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {

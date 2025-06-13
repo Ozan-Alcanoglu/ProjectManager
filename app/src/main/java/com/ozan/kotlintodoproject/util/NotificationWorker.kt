@@ -25,13 +25,24 @@ class NotificationWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            sendNotification("Test Bildirimi", "Bu bir test bildirimidir!")
+            val highPriorityProjects = projectService.getHighPriorityProjects()
+
+            if (highPriorityProjects.isNotEmpty()) {
+                highPriorityProjects.forEach { project ->
+                    sendNotification(
+                        title = "⚠️ Önemli Proje: ${project.title}",
+                        message = "Bu proje yüksek öncelikli. Hatırlatma: ${project.description!!.take(50)}"
+                    )
+                }
+            }
+
             Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure()
         }
     }
+
 
     private fun sendNotification(title: String, message: String) {
         val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

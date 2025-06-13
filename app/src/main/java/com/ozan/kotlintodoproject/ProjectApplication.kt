@@ -10,8 +10,12 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class ProjectApplication : Application() {
     companion object {
-        const val NOTIFICATION_CHANNEL_ID = "project_channel"
+        const val HIGH_PRIORITY_CHANNEL_ID = "project_high_priority_channel"
+        const val MEDIUM_PRIORITY_CHANNEL_ID = "project_medium_priority_channel"
+        const val LOW_PRIORITY_CHANNEL_ID = "project_low_priority_channel"
+        const val NOTIFICATION_CHANNEL_ID = "NOTIFICATION_CHANNEL_ID"
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -20,15 +24,36 @@ class ProjectApplication : Application() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Project Notifications"
-            val descriptionText = "Channel for project notifications"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply {
-                description = descriptionText
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val highChannel = NotificationChannel(
+                HIGH_PRIORITY_CHANNEL_ID,
+                "Yüksek Öncelikli Bildirimler",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Acil ve önemli projeler için"
             }
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+
+            val mediumChannel = NotificationChannel(
+                MEDIUM_PRIORITY_CHANNEL_ID,
+                "Orta Öncelikli Bildirimler",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Orta öncelikli projeler için"
+            }
+
+            val lowChannel = NotificationChannel(
+                LOW_PRIORITY_CHANNEL_ID,
+                "Düşük Öncelikli Bildirimler",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Hatırlatma düzeyinde projeler için"
+            }
+
+            manager.createNotificationChannel(highChannel)
+            manager.createNotificationChannel(mediumChannel)
+            manager.createNotificationChannel(lowChannel)
         }
     }
+
 }

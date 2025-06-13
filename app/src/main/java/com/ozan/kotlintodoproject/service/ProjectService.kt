@@ -83,6 +83,21 @@ class ProjectService @Inject constructor(
             else -> projectDao.getByPriorityAscDateAsc()
         }
     }
+
+
+    suspend fun getLowPriorityProjects(): List<Project> {
+        return projectDao.getLowPriorityProjects()
+    }
+
+    suspend fun getMediumPriorityProjects(): List<Project> {
+        return projectDao.getMediumPriorityProjects()
+    }
+
+    suspend fun getHighPriorityProjects(): List<Project> {
+        return projectDao.getHighPriorityProjects()
+    }
+
+
 }
 
-fun ProjectDao.getProjectByIdAsFlow(projectId: String): Flow<Project?> = getByIdAsFlow(projectId)
+

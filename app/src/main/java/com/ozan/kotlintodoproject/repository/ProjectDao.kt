@@ -64,4 +64,16 @@ interface ProjectDao {
 
     @Query("UPDATE projects SET status = :status WHERE id = :id")
     suspend fun updateStatus(id: String, status: String)
+
+
+    @Query("SELECT * FROM projects WHERE priority = 0")
+    suspend fun getLowPriorityProjects(): List<Project>
+
+    @Query("SELECT * FROM projects WHERE priority = 1")
+    suspend fun getMediumPriorityProjects(): List<Project>
+
+    @Query("SELECT * FROM projects WHERE priority = 2")
+    suspend fun getHighPriorityProjects(): List<Project>
+
+
 }

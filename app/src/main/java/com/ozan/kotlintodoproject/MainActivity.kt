@@ -12,10 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.ozan.kotlintodoproject.navigation.NavGraph
 import com.ozan.kotlintodoproject.ui.theme.KotlinAıWorkTheme
+import com.ozan.kotlintodoproject.util.HighPriorityWorker
+import com.ozan.kotlintodoproject.util.LowPriorityWorker
+import com.ozan.kotlintodoproject.util.MediumPriorityWorker
 import com.ozan.kotlintodoproject.worker.NotificationWorker
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
@@ -24,22 +28,42 @@ import java.util.concurrent.TimeUnit
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        val request = PeriodicWorkRequestBuilder<NotificationWorker>(
-            15,
-            TimeUnit.MINUTES,
-            5,
-            TimeUnit.MINUTES
+        val highPriorityRequest = PeriodicWorkRequestBuilder<HighPriorityWorker>(
+            1, TimeUnit.DAYS
         ).build()
 
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                "project_notification_worker",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                request
-            )
+        val mediumPriorityRequest = PeriodicWorkRequestBuilder<MediumPriorityWorker>(
+            4, TimeUnit.DAYS
+        ).build()
 
+        val lowPriorityRequest = PeriodicWorkRequestBuilder<LowPriorityWorker>(
+            7, TimeUnit.DAYS
+        ).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "high_priority_notification",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            highPriorityRequest
+        )
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "medium_priority_notification",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            mediumPriorityRequest
+        )
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "low_priority_notification",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            lowPriorityRequest
+        )
+
+        val testRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInitialDelay(10, TimeUnit.SECONDS)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(testRequest)
 
 
         setContent {
@@ -53,6 +77,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
 
 }
