@@ -5,10 +5,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.work.Configuration
+import androidx.hilt.work.HiltWorkerFactory
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class ProjectApplication : Application() {
+class ProjectApplication : Application(), Configuration.Provider {
+
     companion object {
         const val HIGH_PRIORITY_CHANNEL_ID = "project_high_priority_channel"
         const val MEDIUM_PRIORITY_CHANNEL_ID = "project_medium_priority_channel"
@@ -16,6 +20,14 @@ class ProjectApplication : Application() {
         const val NOTIFICATION_CHANNEL_ID = "NOTIFICATION_CHANNEL_ID"
     }
 
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .setMinimumLoggingLevel(android.util.Log.DEBUG)
+            .build()
 
     override fun onCreate() {
         super.onCreate()
@@ -55,5 +67,4 @@ class ProjectApplication : Application() {
             manager.createNotificationChannel(lowChannel)
         }
     }
-
 }

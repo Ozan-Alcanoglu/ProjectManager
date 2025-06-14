@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val highPriorityRequest = PeriodicWorkRequestBuilder<HighPriorityWorker>(
-            1, TimeUnit.DAYS
+            20, TimeUnit.MINUTES
         ).build()
 
         val mediumPriorityRequest = PeriodicWorkRequestBuilder<MediumPriorityWorker>(
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
             lowPriorityRequest
         )
 
-        val testRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+        val testRequest = OneTimeWorkRequestBuilder<HighPriorityWorker>()
             .setInitialDelay(10, TimeUnit.SECONDS)
             .build()
 
