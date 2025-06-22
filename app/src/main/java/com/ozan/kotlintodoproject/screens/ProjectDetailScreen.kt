@@ -202,7 +202,7 @@ fun ProjectDetail(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Geri",
-                            tint = Color.White
+                            tint = Color.Black
                         )
                     }
                 },
@@ -222,8 +222,8 @@ fun ProjectDetail(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black
                 )
             )
         }
@@ -349,7 +349,7 @@ fun ProjectDetail(
                     .padding(vertical = 16.dp, horizontal = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E0CC))
             ) {
-                Text("Kaydet")
+                Text("Kaydet", color = Color.Black)
             }
 
 

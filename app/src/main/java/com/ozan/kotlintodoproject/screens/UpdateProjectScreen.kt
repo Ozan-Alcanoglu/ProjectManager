@@ -51,7 +51,7 @@ fun UpdateProject(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Geri",
-                            tint = Color.White
+                            tint = Color.Black
                         )
                     }
                 },
@@ -70,8 +70,8 @@ fun UpdateProject(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black
                 )
             )
         }
@@ -165,7 +165,10 @@ fun UpdateProject(
                 }
             }
 
+
+
             projectViewModel.currentProject?.description?.let { description ->
+
                 Text(
                     text = "-$description",
                     fontSize = 25.sp,
@@ -257,7 +260,7 @@ fun UpdateProject(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E0CC))
 
             ) {
-                Text("Kaydet")
+                Text("Kaydet", color = Color.Black)
             }
 
         }

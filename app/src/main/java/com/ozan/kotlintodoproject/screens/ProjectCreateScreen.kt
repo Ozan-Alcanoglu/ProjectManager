@@ -44,14 +44,14 @@ fun ProjectCreateScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Geri",
-                            tint = Color.White
+                            tint = Color.Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black
                 )
             )
         }
@@ -139,7 +139,7 @@ fun ProjectCreateScreen(
                 modifier = Modifier.fillMaxSize(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E0CC))
             ) {
-                Text("Devam Et")
+                Text("Devam Et", color = Color.Black)
             }
 
 

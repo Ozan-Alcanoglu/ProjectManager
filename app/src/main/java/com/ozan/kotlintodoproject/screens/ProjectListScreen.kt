@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +44,11 @@ fun ProjectListScreen(
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-
     var hasNotificationPermission by remember {
         mutableStateOf(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
             } else true
         )
     }
@@ -56,17 +57,44 @@ fun ProjectListScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         hasNotificationPermission = isGranted
-        if (!isGranted) {
-            Toast.makeText(context, "Bildirim izni reddedildi", Toast.LENGTH_SHORT).show()
-        } else {
+        if (isGranted) {
             Toast.makeText(context, "Bildirim izni verildi", Toast.LENGTH_SHORT).show()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val activity = context as? android.app.Activity
+            if (activity != null && !activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                intent.data = android.net.Uri.parse("package:" + context.packageName)
+                context.startActivity(intent)
+            } else {
+            }
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            title = { Text("Bildirim İzni") },
+            text = { Text("Uygulama bildirimlerini alabilmek için lütfen izin verin.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showPermissionDialog = false
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                ) {
+                    Text("İzin Ver")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showPermissionDialog = false }
+                ) {
+                    Text("İptal")
+                }
+            }
+        )
     }
 
     var priorityFilter by remember { mutableStateOf<String?>(null) }
@@ -102,73 +130,35 @@ fun ProjectListScreen(
     }
 
     Scaffold(
-        floatingActionButton = {
+
+        floatingActionButton={
             FloatingActionButton(
-                onClick = {
-                    try {
-                        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            val channel = notificationManager.getNotificationChannel(ProjectApplication.NOTIFICATION_CHANNEL_ID)
-                            if (channel == null) {
-                                val newChannel = NotificationChannel(
-                                    ProjectApplication.NOTIFICATION_CHANNEL_ID,
-                                    "Proje Bildirimleri",
-                                    NotificationManager.IMPORTANCE_DEFAULT
-                                ).apply {
-                                    description = "Proje hatırlatıcıları için bildirim kanalı"
-                                }
-                                notificationManager.createNotificationChannel(newChannel)
-                            }
-                        }
-
-                        val notification = NotificationCompat.Builder(context, ProjectApplication.NOTIFICATION_CHANNEL_ID)
-                            .setSmallIcon(android.R.drawable.ic_dialog_info)
-                            .setContentTitle("Test Bildirimi")
-                            .setContentText("Bu bir test bildirimidir!")
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setAutoCancel(true)
-                            .build()
-
-                        notificationManager.notify(1, notification)
-                        Toast.makeText(context, "Bildirim gönderildi!", Toast.LENGTH_SHORT).show()
-                    } catch (e: Exception) {
-                        Toast.makeText(context, "Hata: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
-            ) {
-                Icon(Icons.Default.Notifications, "Bildirim Testi")
+                onClick = { onNavigate("add_project") }
+            ){
+                Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle")
             }
         },
         topBar = {
             TopAppBar(
                 title = { Text("Projelerim") },
                 actions = {
-                    IconButton(onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            if (!hasNotificationPermission) {
-                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            } else {
-                                Toast.makeText(context, "Bildirim izni zaten verilmiş", Toast.LENGTH_SHORT).show()
-                            }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
+                        IconButton(
+                            onClick = { showPermissionDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Bildirim İzni İste",
+                                tint = Color.White
+                            )
                         }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Bildirim İkonu",
-                            tint = Color.White
-                        )
                     }
-                    IconButton(onClick = { onNavigate("add_project") }) {
-                        Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle")
-                    }
-
 
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black
                 )
             )
         }
