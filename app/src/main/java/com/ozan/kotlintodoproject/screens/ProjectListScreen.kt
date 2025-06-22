@@ -133,9 +133,11 @@ fun ProjectListScreen(
 
         floatingActionButton={
             FloatingActionButton(
-                onClick = { onNavigate("add_project") }
+                onClick = { onNavigate("add_project") },
+                containerColor = Color(0xFF4300CC)
+
             ){
-                Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle")
+                Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle",tint=Color(0xFFFFFFFF))
             }
         },
         topBar = {
@@ -156,9 +158,9 @@ fun ProjectListScreen(
 
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black
+                    containerColor = Color(0xFF4300CC),
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
         }
@@ -308,7 +310,7 @@ fun FilterSection(
         }
 
         TextButton(onClick = onReset) {
-            Text("Filtreyi Sıfırla")
+            Text("Filtreyi Sıfırla",color = Color.Black)
         }
     }
 }

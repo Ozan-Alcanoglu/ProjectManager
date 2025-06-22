@@ -51,7 +51,7 @@ fun UpdateProject(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Geri",
-                            tint = Color.Black
+                            tint = Color.White
                         )
                     }
                 },
@@ -69,9 +69,9 @@ fun UpdateProject(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black
+                    containerColor = Color(0xFF4300CC),
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
         }
@@ -133,7 +133,8 @@ fun UpdateProject(
                     text = title,
                     fontSize = 34.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp, top = 20.dp)
+                    modifier = Modifier.padding(start = 12.dp, top = 20.dp),
+                    color = Color.Black
                 )
             }
 
@@ -172,24 +173,27 @@ fun UpdateProject(
                     text = "Açıklama:",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 12.dp, top = 30.dp)
+                    modifier = Modifier.padding(start = 12.dp, top = 30.dp),
+                    color = Color.Black
                 )
                 Text(
                     text = "-$description",
                     fontSize = 25.sp,
-                    modifier = Modifier.padding(start = 12.dp, top = 8.dp)
+                    modifier = Modifier.padding(start = 12.dp, top = 8.dp),
+                    color = Color.Black
                 )
             }
 
             Spacer(modifier = Modifier.height(40.dp))
-            
+
             Text(
                 text = "Görevler:",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 12.dp, top = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 12.dp, top = 16.dp, bottom = 8.dp),
+                color = Color.Black
             )
-            
+
             val groupedTasks = tasks.groupBy { it.parentId }
 
             tasks.filter { it.parentId == null }.forEach { parentTask ->
@@ -204,7 +208,8 @@ fun UpdateProject(
                     Text(
                         text = "▶ " + (parentTask.taskname ?: ""),
                         fontSize = 30.sp,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        color = Color.Black
                     )
                     Checkbox(
                         checked = isChecked,
@@ -237,7 +242,8 @@ fun UpdateProject(
                         Text(
                             text = subtask.taskname ?: "",
                             fontSize = 20.sp,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = Color.Black
                         )
                         Checkbox(
                             checked = isSubChecked,
@@ -269,10 +275,10 @@ fun UpdateProject(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E0CC))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4300CC))
 
             ) {
-                Text("Kaydet", color = Color.Black)
+                Text("Kaydet", color = Color.White)
             }
 
         }

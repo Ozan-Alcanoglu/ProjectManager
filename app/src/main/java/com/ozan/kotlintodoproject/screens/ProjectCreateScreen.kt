@@ -1,5 +1,6 @@
 package com.ozan.kotlintodoproject.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +35,7 @@ fun ProjectCreateScreen(
 
 
     Scaffold(
+        containerColor = Color(0xFFF5F5F5),
         topBar = {
             TopAppBar(
                 title = {
@@ -44,14 +46,14 @@ fun ProjectCreateScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Geri",
-                            tint = Color.Black
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF00E0CC),
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black
+                    containerColor = Color(0xFF4300CC),
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
         }
@@ -62,6 +64,7 @@ fun ProjectCreateScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
+                .background(Color(0xFFF5F5F5))
         ) {
 
             var title by remember { mutableStateOf("") }
@@ -137,9 +140,9 @@ fun ProjectCreateScreen(
                 },
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxSize(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E0CC))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4300CC))
             ) {
-                Text("Devam Et", color = Color.Black)
+                Text("Devam Et", color = Color.White)
             }
 
 
