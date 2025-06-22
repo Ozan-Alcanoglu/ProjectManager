@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val highPriorityRequest = PeriodicWorkRequestBuilder<HighPriorityWorker>(
-            20, TimeUnit.MINUTES
+            1, TimeUnit.DAYS
         ).build()
 
         val mediumPriorityRequest = PeriodicWorkRequestBuilder<MediumPriorityWorker>(
@@ -59,11 +59,12 @@ class MainActivity : ComponentActivity() {
             lowPriorityRequest
         )
 
-        val testRequest = OneTimeWorkRequestBuilder<HighPriorityWorker>()
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .build()
-
-        WorkManager.getInstance(applicationContext).enqueue(testRequest)
+//  THIS FIELD IS FOR THE NOTIFICATION TEST
+//        val testRequest = OneTimeWorkRequestBuilder<HighPriorityWorker>()
+//            .setInitialDelay(10, TimeUnit.SECONDS)
+//            .build()
+//
+//        WorkManager.getInstance(applicationContext).enqueue(testRequest)
 
 
         setContent {
