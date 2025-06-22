@@ -34,7 +34,7 @@ data class Task(
     val id:String=UUID.randomUUID().toString(),
     val branchId: String? = null,
 
-    val taskname: String? = null,
+    val taskname: String,
 
     val projectId: String,
 

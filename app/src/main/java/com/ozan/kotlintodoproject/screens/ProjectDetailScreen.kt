@@ -1,6 +1,7 @@
 package com.ozan.kotlintodoproject.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -187,6 +189,9 @@ fun ProjectDetail(
 
     val scrollState = rememberScrollState()
     val items by sharedViewModel.nestedTextFields.collectAsState()
+
+    val context = LocalContext.current
+
 //
 //
 //    val state by viewModel.state
@@ -299,9 +304,15 @@ fun ProjectDetail(
                                 val projectId = project.id
 
                                 items.forEach { rootItem ->
+                                    if (rootItem.text.isBlank()) {
+                                        Toast.makeText(context, "Ana görev boş olamaz", Toast.LENGTH_LONG).show()
+                                        return@launch
+                                    }
+
                                     val branchResult = sharedViewModel.addBranch(rootItem.text)
 
                                     branchResult.onSuccess { branch ->
+
                                         val mainTaskResult = sharedViewModel.addTask(
                                             projectId = projectId,
                                             branchId = branch.id,
@@ -311,6 +322,11 @@ fun ProjectDetail(
 
                                         mainTaskResult.onSuccess { mainTask ->
                                             rootItem.children.forEach { childItem ->
+                                                if (childItem.text.isBlank()) {
+                                                    Toast.makeText(context, "Alt görev boş olamaz", Toast.LENGTH_LONG).show()
+                                                    return@launch
+                                                }
+
                                                 val childTaskResult = sharedViewModel.addTask(
                                                     projectId = projectId,
                                                     branchId = branch.id,
@@ -320,6 +336,11 @@ fun ProjectDetail(
 
                                                 childTaskResult.onSuccess { childTask ->
                                                     childItem.children.forEach { subChildItem ->
+                                                        if (subChildItem.text.isBlank()) {
+                                                            Toast.makeText(context, "Alt-alt görev boş olamaz", Toast.LENGTH_LONG).show()
+                                                            return@launch
+                                                        }
+
                                                         sharedViewModel.addTask(
                                                             projectId = projectId,
                                                             branchId = branch.id,
@@ -334,6 +355,7 @@ fun ProjectDetail(
                                         Log.e("SaveProject", "Branch eklenirken hata: ${e.message}")
                                     }
                                 }
+
 
                                 onSave()
                             }.onFailure { e ->
