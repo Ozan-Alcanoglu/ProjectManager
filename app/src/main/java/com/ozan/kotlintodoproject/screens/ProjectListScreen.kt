@@ -205,7 +205,7 @@ fun ProjectListScreen(
                     Text("Henüz proje bulunmuyor", style = MaterialTheme.typography.titleMedium, color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Sağ üstteki + butonuna basarak yeni proje oluşturabilirsiniz",
+                        "Sağ alttaki + butonuna basarak yeni proje oluşturabilirsiniz",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                         textAlign = TextAlign.Center

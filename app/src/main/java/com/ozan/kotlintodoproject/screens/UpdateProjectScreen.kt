@@ -168,16 +168,28 @@ fun UpdateProject(
 
 
             projectViewModel.currentProject?.description?.let { description ->
-
+                Text(
+                    text = "Açıklama:",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 12.dp, top = 30.dp)
+                )
                 Text(
                     text = "-$description",
                     fontSize = 25.sp,
-                    modifier = Modifier.padding(start = 12.dp, top = 30.dp)
+                    modifier = Modifier.padding(start = 12.dp, top = 8.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(40.dp))
-
+            
+            Text(
+                text = "Görevler:",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp, top = 16.dp, bottom = 8.dp)
+            )
+            
             val groupedTasks = tasks.groupBy { it.parentId }
 
             tasks.filter { it.parentId == null }.forEach { parentTask ->

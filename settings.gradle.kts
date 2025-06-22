@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "KotlinAıWork"
+rootProject.name = "Project Manager"
 include(":app")
- 
