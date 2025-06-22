@@ -13,11 +13,11 @@ kapt {
 }
 
 android {
-    namespace = "com.ozan.kotlinawork"
+    namespace = "com.ozan.kotlintodoproject"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.ozan.kotlinawork"
+        applicationId = "com.ozan.kotlintodoproject"
         minSdk = 29
         targetSdk = 35
         versionCode = 1

@@ -24,7 +24,7 @@ object AppModule {
             context,
             AppDatabase::class.java, "project_db"
         )
-        .build()
+            .build()
     }
 
     @Provides
@@ -35,15 +35,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskDao(database: AppDatabase): BranchDao {
+    fun provideBranchDao(database: AppDatabase): BranchDao {
         return database.branchDao()
     }
 
     @Provides
     @Singleton
-    fun provideBranchDao(database: AppDatabase): TaskDao {
+    fun provideTaskDao(database: AppDatabase): TaskDao {
         return database.taskDao()
     }
-
-
 }

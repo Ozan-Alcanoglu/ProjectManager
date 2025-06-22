@@ -41,19 +41,19 @@ class MainActivity : ComponentActivity() {
             7, TimeUnit.DAYS
         ).build()
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             "high_priority_notification",
             ExistingPeriodicWorkPolicy.UPDATE,
             highPriorityRequest
         )
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             "medium_priority_notification",
             ExistingPeriodicWorkPolicy.UPDATE,
             mediumPriorityRequest
         )
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             "low_priority_notification",
             ExistingPeriodicWorkPolicy.UPDATE,
             lowPriorityRequest
@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
             .setInitialDelay(10, TimeUnit.SECONDS)
             .build()
 
-        WorkManager.getInstance(this).enqueue(testRequest)
+        WorkManager.getInstance(applicationContext).enqueue(testRequest)
 
 
         setContent {
