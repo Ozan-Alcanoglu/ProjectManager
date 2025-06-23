@@ -270,8 +270,6 @@ fun FilterSection(
     var dateExpanded by remember { mutableStateOf(false) }
     var completionExpanded by remember { mutableStateOf(false) }
 
-    val buttonWidth = 120.dp
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -281,14 +279,14 @@ fun FilterSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Box {
+            Box(modifier = Modifier.weight(1f)) {
                 OutlinedButton(
                     onClick = { priorityExpanded = true },
-                    modifier = Modifier.width(buttonWidth)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Öncelik", style = MaterialTheme.typography.labelSmall)
-                        Text(text = priorityFilter ?: "-", fontWeight = FontWeight.Bold)
+                        Text("Öncelik", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+                        Text(text = priorityFilter ?: "-", fontWeight = FontWeight.Bold, color = Color.Black)
                     }
                 }
                 DropdownMenu(
@@ -306,14 +304,14 @@ fun FilterSection(
                 }
             }
 
-            Box {
+            Box(modifier = Modifier.weight(1f)) {
                 OutlinedButton(
                     onClick = { dateExpanded = true },
-                    modifier = Modifier.width(buttonWidth)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Tarih", style = MaterialTheme.typography.labelSmall)
-                        Text(text = dateFilter ?: "-", fontWeight = FontWeight.Bold)
+                        Text("Tarih", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+                        Text(text = dateFilter ?: "-", fontWeight = FontWeight.Bold, color = Color.Black)
                     }
                 }
                 DropdownMenu(
@@ -331,14 +329,14 @@ fun FilterSection(
                 }
             }
 
-            Box {
+            Box(modifier = Modifier.weight(1f)) {
                 OutlinedButton(
                     onClick = { completionExpanded = true },
-                    modifier = Modifier.width(buttonWidth)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Tamamlanma", style = MaterialTheme.typography.labelSmall)
-                        Text(text = completionFilter ?: "-", fontWeight = FontWeight.Bold)
+                        Text("İlerleme", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+                        Text(text = completionFilter ?: "-", fontWeight = FontWeight.Bold, color = Color.Black)
                     }
                 }
                 DropdownMenu(

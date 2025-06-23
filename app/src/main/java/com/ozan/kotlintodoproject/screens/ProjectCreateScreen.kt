@@ -74,7 +74,7 @@ fun ProjectCreateScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { newText -> title = newText },
-                label = { Text("Proje ismini girin") },
+                label = { Text("Proje ismini girin", color = Color.Black) },
                 singleLine = true,
                 shape = RoundedCornerShape(
                     topEnd = 8.dp,
@@ -82,9 +82,15 @@ fun ProjectCreateScreen(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Blue,
-                    unfocusedBorderColor = Color.Gray
+                    unfocusedBorderColor = Color.Gray,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 )
-
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -93,7 +99,7 @@ fun ProjectCreateScreen(
             OutlinedTextField(
                 value = description,
                 onValueChange = { newText -> description = newText },
-                label = { Text("Proje açıklamasını girin") },
+                label = { Text("Proje açıklamasını girin", color = Color.Black) },
                 singleLine = true,
                 shape = RoundedCornerShape(
                     topEnd = 8.dp,
@@ -101,9 +107,15 @@ fun ProjectCreateScreen(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Blue,
-                    unfocusedBorderColor = Color.Gray
+                    unfocusedBorderColor = Color.Gray,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 )
-
             )
 
             Spacer(modifier = Modifier.height(16.dp))

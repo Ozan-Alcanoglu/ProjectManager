@@ -242,7 +242,7 @@ fun ProjectDetail(
                 .verticalScroll(scrollState)
         ) {
             Text(
-                text = "Projenizin adımlarınızı belirleyiniz",
+                text = "Projenizin adımlarınızı belirleyiniz(zorunlu değildir)",
                 color = Color.Black,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -295,6 +295,25 @@ fun ProjectDetail(
                 onClick = {
                     coroutineScope.launch {
                         try {
+                            for (rootItem in items) {
+                                if (rootItem.text.isBlank()) {
+                                    Toast.makeText(context, "Ana görev boş olamaz", Toast.LENGTH_LONG).show()
+                                    return@launch
+                                }
+                                for (childItem in rootItem.children) {
+                                    if (childItem.text.isBlank()) {
+                                        Toast.makeText(context, "Alt görev boş olamaz", Toast.LENGTH_LONG).show()
+                                        return@launch
+                                    }
+                                    for (subChildItem in childItem.children) {
+                                        if (subChildItem.text.isBlank()) {
+                                            Toast.makeText(context, "Alt-alt görev boş olamaz", Toast.LENGTH_LONG).show()
+                                            return@launch
+                                        }
+                                    }
+                                }
+                            }
+
                             val projectResult = sharedViewModel.addProject(
                                 title = sharedViewModel.title,
                                 description = sharedViewModel.description,
@@ -305,15 +324,8 @@ fun ProjectDetail(
                                 val projectId = project.id
 
                                 items.forEach { rootItem ->
-                                    if (rootItem.text.isBlank()) {
-                                        Toast.makeText(context, "Ana görev boş olamaz", Toast.LENGTH_LONG).show()
-                                        return@launch
-                                    }
-
                                     val branchResult = sharedViewModel.addBranch(rootItem.text)
-
                                     branchResult.onSuccess { branch ->
-
                                         val mainTaskResult = sharedViewModel.addTask(
                                             projectId = projectId,
                                             branchId = branch.id,
@@ -323,11 +335,6 @@ fun ProjectDetail(
 
                                         mainTaskResult.onSuccess { mainTask ->
                                             rootItem.children.forEach { childItem ->
-                                                if (childItem.text.isBlank()) {
-                                                    Toast.makeText(context, "Alt görev boş olamaz", Toast.LENGTH_LONG).show()
-                                                    return@launch
-                                                }
-
                                                 val childTaskResult = sharedViewModel.addTask(
                                                     projectId = projectId,
                                                     branchId = branch.id,
@@ -337,11 +344,6 @@ fun ProjectDetail(
 
                                                 childTaskResult.onSuccess { childTask ->
                                                     childItem.children.forEach { subChildItem ->
-                                                        if (subChildItem.text.isBlank()) {
-                                                            Toast.makeText(context, "Alt-alt görev boş olamaz", Toast.LENGTH_LONG).show()
-                                                            return@launch
-                                                        }
-
                                                         sharedViewModel.addTask(
                                                             projectId = projectId,
                                                             branchId = branch.id,
@@ -352,11 +354,8 @@ fun ProjectDetail(
                                                 }
                                             }
                                         }
-                                    }.onFailure { e ->
-                                        Log.e("SaveProject", "Branch eklenirken hata: ${e.message}")
                                     }
                                 }
-
 
                                 onSave()
                             }.onFailure { e ->
@@ -366,7 +365,8 @@ fun ProjectDetail(
                             Log.e("SaveProject", "Beklenmeyen hata: ${e.message}")
                         }
                     }
-                },
+                }
+                ,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 16.dp),
