@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
-import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ozan.kotlintodoproject.ProjectApplication
 import com.ozan.kotlintodoproject.model.Project
 import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
 import java.text.SimpleDateFormat
@@ -48,7 +46,7 @@ fun ProjectListScreen(
         mutableStateOf(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
-                android.content.pm.PackageManager.PERMISSION_GRANTED
+                    android.content.pm.PackageManager.PERMISSION_GRANTED
             } else true
         )
     }
@@ -65,7 +63,6 @@ fun ProjectListScreen(
                 val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.data = android.net.Uri.parse("package:" + context.packageName)
                 context.startActivity(intent)
-            } else {
             }
         }
     }
@@ -88,9 +85,7 @@ fun ProjectListScreen(
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showPermissionDialog = false }
-                ) {
+                TextButton(onClick = { showPermissionDialog = false }) {
                     Text("İptal")
                 }
             }
@@ -99,11 +94,12 @@ fun ProjectListScreen(
 
     var priorityFilter by remember { mutableStateOf<String?>(null) }
     var dateFilter by remember { mutableStateOf<String?>(null) }
+    var completionFilter by remember { mutableStateOf<String?>(null) }
 
     val projectList by projectViewModel.projects.collectAsState()
     val projectTaskCompletion by projectViewModel.projectTaskCompletion.collectAsState()
 
-    LaunchedEffect(priorityFilter, dateFilter) {
+    LaunchedEffect(priorityFilter, dateFilter, completionFilter) {
         val priorityDesc = when (priorityFilter) {
             "Yüksek" -> true
             "Düşük" -> false
@@ -116,28 +112,50 @@ fun ProjectListScreen(
             else -> null
         }
 
-        if (priorityDesc != null && dateDesc != null) {
-            projectViewModel.loadProjectsSorted(priorityDesc, dateDesc)
-        } else if (priorityDesc != null) {
-            if (priorityDesc) projectViewModel.loadProjectsByPriorityDesc()
-            else projectViewModel.loadProjectsByPriorityAsc()
-        } else if (dateDesc != null) {
-            if (dateDesc) projectViewModel.loadProjectsByDateDesc()
-            else projectViewModel.loadProjectsByDateAsc()
-        } else {
-            projectViewModel.loadProjects()
+        val completionDesc = when (completionFilter) {
+            "Azalan" -> true
+            "Artan" -> false
+            else -> null
+        }
+
+        when {
+            priorityDesc != null && dateDesc != null && completionDesc != null -> {
+                projectViewModel.loadProjectsSorted(priorityDesc, dateDesc, completionDesc)
+            }
+            priorityDesc != null && dateDesc != null -> {
+                projectViewModel.loadProjectsSortedByPriorityAndDate(priorityDesc, dateDesc)
+            }
+            priorityDesc != null && completionDesc != null -> {
+                projectViewModel.loadProjectsSortedByPriorityAndCompletion(priorityDesc, completionDesc)
+            }
+            dateDesc != null && completionDesc != null -> {
+                projectViewModel.loadProjectsSortedByDateAndCompletion(dateDesc, completionDesc)
+            }
+            priorityDesc != null -> {
+                if (priorityDesc) projectViewModel.loadProjectsByPriorityDesc()
+                else projectViewModel.loadProjectsByPriorityAsc()
+            }
+            dateDesc != null -> {
+                if (dateDesc) projectViewModel.loadProjectsByDateDesc()
+                else projectViewModel.loadProjectsByDateAsc()
+            }
+            completionDesc != null -> {
+                if (completionDesc) projectViewModel.loadProjectsByCompletionDesc()
+                else projectViewModel.loadProjectsByCompletionAsc()
+            }
+            else -> {
+                projectViewModel.loadProjects()
+            }
         }
     }
 
     Scaffold(
-
-        floatingActionButton={
+        floatingActionButton = {
             FloatingActionButton(
                 onClick = { onNavigate("add_project") },
                 containerColor = Color(0xFF4300CC)
-
-            ){
-                Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle",tint=Color(0xFFFFFFFF))
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Yeni Proje Ekle", tint = Color.White)
             }
         },
         topBar = {
@@ -145,9 +163,7 @@ fun ProjectListScreen(
                 title = { Text("Projelerim") },
                 actions = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
-                        IconButton(
-                            onClick = { showPermissionDialog = true }
-                        ) {
+                        IconButton(onClick = { showPermissionDialog = true }) {
                             Icon(
                                 imageVector = Icons.Default.Notifications,
                                 contentDescription = "Bildirim İzni İste",
@@ -155,7 +171,6 @@ fun ProjectListScreen(
                             )
                         }
                     }
-
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF4300CC),
@@ -165,7 +180,6 @@ fun ProjectListScreen(
             )
         }
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -190,9 +204,12 @@ fun ProjectListScreen(
                 onPrioritySelected = { priorityFilter = it },
                 dateFilter = dateFilter,
                 onDateSelected = { dateFilter = it },
+                completionFilter = completionFilter,
+                onCompletionSelected = { completionFilter = it },
                 onReset = {
                     priorityFilter = null
                     dateFilter = null
+                    completionFilter = null
                 }
             )
 
@@ -245,29 +262,35 @@ fun FilterSection(
     onPrioritySelected: (String?) -> Unit,
     dateFilter: String?,
     onDateSelected: (String?) -> Unit,
+    completionFilter: String?,
+    onCompletionSelected: (String?) -> Unit,
     onReset: () -> Unit
 ) {
     var priorityExpanded by remember { mutableStateOf(false) }
     var dateExpanded by remember { mutableStateOf(false) }
+    var completionExpanded by remember { mutableStateOf(false) }
 
-    Row(
+    val buttonWidth = 120.dp
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Box {
-                Text(
-                    text = "Öncelik: ${priorityFilter ?: "-"}",
-                    modifier = Modifier
-                        .clickable { priorityExpanded = true }
-                        .padding(8.dp)
-                        .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    color = Color.Black
-                )
+                OutlinedButton(
+                    onClick = { priorityExpanded = true },
+                    modifier = Modifier.width(buttonWidth)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Öncelik", style = MaterialTheme.typography.labelSmall)
+                        Text(text = priorityFilter ?: "-", fontWeight = FontWeight.Bold)
+                    }
+                }
                 DropdownMenu(
                     expanded = priorityExpanded,
                     onDismissRequest = { priorityExpanded = false }
@@ -284,15 +307,15 @@ fun FilterSection(
             }
 
             Box {
-                Text(
-                    text = "Tarih: ${dateFilter ?: "-"}",
-                    modifier = Modifier
-                        .clickable { dateExpanded = true }
-                        .padding(8.dp)
-                        .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    color = Color.Black
-                )
+                OutlinedButton(
+                    onClick = { dateExpanded = true },
+                    modifier = Modifier.width(buttonWidth)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Tarih", style = MaterialTheme.typography.labelSmall)
+                        Text(text = dateFilter ?: "-", fontWeight = FontWeight.Bold)
+                    }
+                }
                 DropdownMenu(
                     expanded = dateExpanded,
                     onDismissRequest = { dateExpanded = false }
@@ -307,13 +330,46 @@ fun FilterSection(
                     })
                 }
             }
+
+            Box {
+                OutlinedButton(
+                    onClick = { completionExpanded = true },
+                    modifier = Modifier.width(buttonWidth)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Tamamlanma", style = MaterialTheme.typography.labelSmall)
+                        Text(text = completionFilter ?: "-", fontWeight = FontWeight.Bold)
+                    }
+                }
+                DropdownMenu(
+                    expanded = completionExpanded,
+                    onDismissRequest = { completionExpanded = false }
+                ) {
+                    DropdownMenuItem(text = { Text("Artan") }, onClick = {
+                        onCompletionSelected("Artan")
+                        completionExpanded = false
+                    })
+                    DropdownMenuItem(text = { Text("Azalan") }, onClick = {
+                        onCompletionSelected("Azalan")
+                        completionExpanded = false
+                    })
+                }
+            }
         }
 
-        TextButton(onClick = onReset) {
-            Text("Filtreyi Sıfırla",color = Color.Black)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(onClick = onReset) {
+                Text("Filtreyi Sıfırla", color = Color.Black)
+            }
         }
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

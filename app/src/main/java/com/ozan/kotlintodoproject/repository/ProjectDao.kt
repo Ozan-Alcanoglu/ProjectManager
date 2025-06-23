@@ -4,9 +4,6 @@ import androidx.room.*
 import com.ozan.kotlintodoproject.model.Project
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Proje veritabanı işlemleri için DAO arayüzü
- */
 @Dao
 interface ProjectDao {
 
@@ -75,5 +72,167 @@ interface ProjectDao {
     @Query("SELECT * FROM projects WHERE priority = 2")
     suspend fun getHighPriorityProjects(): List<Project>
 
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY completion DESC
+    """)
+    suspend fun getAllByCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY completion ASC
+    """)
+    suspend fun getAllByCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority DESC, completion DESC
+    """)
+    suspend fun getByPriorityDescCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority DESC, completion ASC
+    """)
+    suspend fun getByPriorityDescCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority ASC, completion DESC
+    """)
+    suspend fun getByPriorityAscCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority ASC, completion ASC
+    """)
+    suspend fun getByPriorityAscCompletionAsc(): List<Project>
+
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY createdAt DESC, completion DESC
+    """)
+    suspend fun getByDateDescCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY createdAt DESC, completion ASC
+    """)
+    suspend fun getByDateDescCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY createdAt ASC, completion DESC
+    """)
+    suspend fun getByDateAscCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY createdAt ASC, completion ASC
+    """)
+    suspend fun getByDateAscCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority DESC, createdAt DESC, completion DESC
+    """)
+    suspend fun getByPriorityDescDateDescCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority DESC, createdAt DESC, completion ASC
+    """)
+    suspend fun getByPriorityDescDateDescCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority ASC, createdAt ASC, completion DESC
+    """)
+    suspend fun getByPriorityAscDateAscCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority ASC, createdAt ASC, completion ASC
+    """)
+    suspend fun getByPriorityAscDateAscCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority DESC, createdAt ASC, completion DESC
+    """)
+    suspend fun getByPriorityDescDateAscCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority ASC, createdAt DESC, completion DESC
+    """)
+    suspend fun getByPriorityAscDateDescCompletionDesc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority DESC, createdAt ASC, completion ASC
+    """)
+    suspend fun getByPriorityDescDateAscCompletionAsc(): List<Project>
+
+    @Query("""
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id AND pi.isDone = 1) * 100.0 /
+               NULLIF((SELECT COUNT(*) FROM project_items pi WHERE pi.projectId = p.id), 0) as completion
+        FROM projects p
+        ORDER BY priority ASC, createdAt DESC, completion ASC
+    """)
+    suspend fun getByPriorityAscDateDescCompletionAsc(): List<Project>
 
 }

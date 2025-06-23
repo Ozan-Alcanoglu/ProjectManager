@@ -36,6 +36,7 @@ class ProjectViewModel @Inject constructor(
 
     private var priorityDesc: Boolean = true
     private var dateDesc: Boolean = true
+    private var completionDesc: Boolean = true
 
 
     fun loadProjects() {
@@ -168,14 +169,88 @@ class ProjectViewModel @Inject constructor(
         }
     }
 
-    fun loadProjectsSorted(priorityDesc: Boolean, dateDesc: Boolean) {
+    fun loadProjectsSortedByPriorityAndDate(priorityDesc: Boolean, dateDesc: Boolean) {
         this.priorityDesc = priorityDesc
         this.dateDesc = dateDesc
 
         viewModelScope.launch {
-            val result = projectService.getProjectsSorted(priorityDesc, dateDesc)
-            _projects.value = result
+            try {
+                val result = projectService.getProjectsSortedByPriorityAndDate(priorityDesc, dateDesc)
+                _projects.value = result
+                loadTaskCompletionForAllProjects()
+            } catch (e: Exception) {
+                Log.e("ProjectViewModel", "Projeler öncelik ve tarihe göre sıralanırken hata: ${e.message}", e)
+            }
         }
     }
 
+    fun loadProjectsSortedByPriorityAndCompletion(priorityDesc: Boolean, completionDesc: Boolean) {
+        this.priorityDesc = priorityDesc
+        this.completionDesc = completionDesc
+
+        viewModelScope.launch {
+            try {
+                val result = projectService.getProjectsSortedByPriorityAndCompletion(priorityDesc, completionDesc)
+                _projects.value = result
+                loadTaskCompletionForAllProjects()
+            } catch (e: Exception) {
+                Log.e("ProjectViewModel", "Projeler öncelik ve tamamlanmaya göre sıralanırken hata: ${e.message}", e)
+            }
+        }
+    }
+
+    fun loadProjectsSortedByDateAndCompletion(dateDesc: Boolean, completionDesc: Boolean) {
+        this.dateDesc = dateDesc
+        this.completionDesc = completionDesc
+
+        viewModelScope.launch {
+            try {
+                val result = projectService.getProjectsSortedByDateAndCompletion(dateDesc, completionDesc)
+                _projects.value = result
+                loadTaskCompletionForAllProjects()
+            } catch (e: Exception) {
+                Log.e("ProjectViewModel", "Projeler tarih ve tamamlanmaya göre sıralanırken hata: ${e.message}", e)
+            }
+        }
+    }
+
+    fun loadProjectsSorted(priorityDesc: Boolean, dateDesc: Boolean, completionDesc: Boolean) {
+        this.priorityDesc = priorityDesc
+        this.dateDesc = dateDesc
+        this.completionDesc = completionDesc
+
+        viewModelScope.launch {
+            try {
+                val result = projectService.getProjectsSorted(priorityDesc, dateDesc, completionDesc)
+                _projects.value = result
+                loadTaskCompletionForAllProjects()
+            } catch (e: Exception) {
+                Log.e("ProjectViewModel", "Projeler sıralanırken hata: ${e.message}", e)
+            }
+        }
+    }
+
+    fun loadProjectsByCompletionDesc() {
+        viewModelScope.launch {
+            try {
+                val sortedProjects = projectService.getAllByCompletionDesc()
+                _projects.value = sortedProjects
+                loadTaskCompletionForAllProjects()
+            } catch (e: Exception) {
+                Log.e("ProjectViewModel", "Projeler tamamlanma yüzdesine göre azalan sıralamada yüklenirken hata: ${e.message}", e)
+            }
+        }
+    }
+
+    fun loadProjectsByCompletionAsc() {
+        viewModelScope.launch {
+            try {
+                val sortedProjects = projectService.getAllByCompletionAsc()
+                _projects.value = sortedProjects
+                loadTaskCompletionForAllProjects()
+            } catch (e: Exception) {
+                Log.e("ProjectViewModel", "Projeler tamamlanma yüzdesine göre artan sıralamada yüklenirken hata: ${e.message}", e)
+            }
+        }
+    }
 }

@@ -68,14 +68,12 @@ class ProjectService @Inject constructor(
         projectDao.updateStatus(projectId, status)
     }
 
-    fun getProgress(projectId: String): Flow<Float> {
+    fun getProgress(): Flow<Float> {
         TODO()
     }
 
-    suspend fun getProjectsSorted(
-        priorityDesc: Boolean,
-        dateDesc: Boolean
-    ): List<Project> {
+
+    suspend fun getProjectsSortedByPriorityAndDate(priorityDesc: Boolean, dateDesc: Boolean): List<Project> {
         return when {
             priorityDesc && dateDesc -> projectDao.getByPriorityDescDateDesc()
             priorityDesc && !dateDesc -> projectDao.getByPriorityDescDateAsc()
@@ -83,6 +81,42 @@ class ProjectService @Inject constructor(
             else -> projectDao.getByPriorityAscDateAsc()
         }
     }
+
+    suspend fun getProjectsSortedByPriorityAndCompletion(priorityDesc: Boolean, completionDesc: Boolean): List<Project> {
+        return when {
+            priorityDesc && completionDesc -> projectDao.getByPriorityDescCompletionDesc()
+            priorityDesc && !completionDesc -> projectDao.getByPriorityDescCompletionAsc()
+            !priorityDesc && completionDesc -> projectDao.getByPriorityAscCompletionDesc()
+            else -> projectDao.getByPriorityAscCompletionAsc()
+        }
+    }
+
+    suspend fun getProjectsSortedByDateAndCompletion(dateDesc: Boolean, completionDesc: Boolean): List<Project> {
+        return when {
+            dateDesc && completionDesc -> projectDao.getByDateDescCompletionDesc()
+            dateDesc && !completionDesc -> projectDao.getByDateDescCompletionAsc()
+            !dateDesc && completionDesc -> projectDao.getByDateAscCompletionDesc()
+            else -> projectDao.getByDateAscCompletionAsc()
+        }
+    }
+
+    suspend fun getProjectsSorted(
+        priorityDesc: Boolean,
+        dateDesc: Boolean,
+        completionDesc: Boolean
+    ): List<Project> {
+        return when {
+            priorityDesc && dateDesc && completionDesc -> projectDao.getByPriorityDescDateDescCompletionDesc()
+            priorityDesc && dateDesc && !completionDesc -> projectDao.getByPriorityDescDateDescCompletionAsc()
+            priorityDesc && !dateDesc && completionDesc -> projectDao.getByPriorityDescDateAscCompletionDesc()
+            priorityDesc && !dateDesc && !completionDesc -> projectDao.getByPriorityDescDateAscCompletionAsc()
+            !priorityDesc && dateDesc && completionDesc -> projectDao.getByPriorityAscDateDescCompletionDesc()
+            !priorityDesc && dateDesc && !completionDesc -> projectDao.getByPriorityAscDateDescCompletionAsc()
+            !priorityDesc && !dateDesc && completionDesc -> projectDao.getByPriorityAscDateAscCompletionDesc()
+            else -> projectDao.getByPriorityAscDateAscCompletionAsc()
+        }
+    }
+
 
 
     suspend fun getLowPriorityProjects(): List<Project> {
@@ -97,6 +131,77 @@ class ProjectService @Inject constructor(
         return projectDao.getHighPriorityProjects()
     }
 
+    suspend fun getAllByCompletionDesc(): List<Project> {
+        return projectDao.getAllByCompletionDesc()
+    }
+
+    suspend fun getAllByCompletionAsc(): List<Project> {
+        return projectDao.getAllByCompletionAsc()
+    }
+
+    suspend fun getByPriorityDescCompletionDesc(): List<Project> {
+        return projectDao.getByPriorityDescCompletionDesc()
+    }
+
+    suspend fun getByPriorityDescCompletionAsc(): List<Project> {
+        return projectDao.getByPriorityDescCompletionAsc()
+    }
+
+    suspend fun getByPriorityAscCompletionDesc(): List<Project> {
+        return projectDao.getByPriorityAscCompletionDesc()
+    }
+
+    suspend fun getByPriorityAscCompletionAsc(): List<Project> {
+        return projectDao.getByPriorityAscCompletionAsc()
+    }
+
+    suspend fun getByDateDescCompletionDesc(): List<Project> {
+        return projectDao.getByDateDescCompletionDesc()
+    }
+
+    suspend fun getByDateDescCompletionAsc(): List<Project> {
+        return projectDao.getByDateDescCompletionAsc()
+    }
+
+    suspend fun getByDateAscCompletionDesc(): List<Project> {
+        return projectDao.getByDateAscCompletionDesc()
+    }
+
+    suspend fun getByDateAscCompletionAsc(): List<Project> {
+        return projectDao.getByDateAscCompletionAsc()
+    }
+
+    suspend fun getByPriorityDescDateDescCompletionDesc(): List<Project> {
+        return projectDao.getByPriorityDescDateDescCompletionDesc()
+    }
+
+    suspend fun getByPriorityDescDateDescCompletionAsc(): List<Project> {
+        return projectDao.getByPriorityDescDateDescCompletionAsc()
+    }
+
+    suspend fun getByPriorityDescDateAscCompletionDesc(): List<Project> {
+        return projectDao.getByPriorityDescDateAscCompletionDesc()
+    }
+
+    suspend fun getByPriorityDescDateAscCompletionAsc(): List<Project> {
+        return projectDao.getByPriorityDescDateAscCompletionAsc()
+    }
+
+    suspend fun getByPriorityAscDateDescCompletionDesc(): List<Project> {
+        return projectDao.getByPriorityAscDateDescCompletionDesc()
+    }
+
+    suspend fun getByPriorityAscDateDescCompletionAsc(): List<Project> {
+        return projectDao.getByPriorityAscDateDescCompletionAsc()
+    }
+
+    suspend fun getByPriorityAscDateAscCompletionDesc(): List<Project> {
+        return projectDao.getByPriorityAscDateAscCompletionDesc()
+    }
+
+    suspend fun getByPriorityAscDateAscCompletionAsc(): List<Project> {
+        return projectDao.getByPriorityAscDateAscCompletionAsc()
+    }
 
 }
 
