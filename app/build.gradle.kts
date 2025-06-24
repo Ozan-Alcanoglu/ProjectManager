@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
 
+    implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")
+
     // Material 2 (for swipe-to-delete)
     implementation("androidx.compose.material:material:1.6.0")
 

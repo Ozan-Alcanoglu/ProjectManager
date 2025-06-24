@@ -118,7 +118,8 @@ fun NavGraph(
             UpdateProjectDetailScreen(
                 projectId = projectId,
                 onBack = { navController.navigateUp() },
-                projectViewModel = projectViewModel
+                projectViewModel = projectViewModel,
+                sharedViewModel = sharedViewModel
             )
         }
 

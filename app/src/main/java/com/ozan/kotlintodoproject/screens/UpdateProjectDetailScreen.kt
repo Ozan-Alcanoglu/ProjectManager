@@ -1,209 +1,108 @@
 package com.ozan.kotlintodoproject.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.ozan.kotlintodoproject.ui.components.FormTextField
-
-//@Immutable
-//data class UpdateNestedTextField(
-//    val id: Int,
-//    val text: String,
-//    val children: List<NestedTextField> = emptyList(),
-//    val isExpanded: Boolean = true
-//) {
-//    fun updateText(newText: String): NestedTextField {
-//        return copy(text = newText)
-//    }
-//
-//    fun addChild(newChild: NestedTextField): NestedTextField {
-//        return copy(children = children + newChild)
-//    }
-//
-//    fun toggleExpanded(): NestedTextField {
-//        return copy(isExpanded = !isExpanded)
-//    }
-//}
-//
-//private fun updateItemInList(
-//    items: List<NestedTextField>,
-//    itemId: Int,
-//    update: (NestedTextField) -> NestedTextField
-//): MutableList<NestedTextField> {
-//    return items.map { item ->
-//        if (item.id == itemId) {
-//            update(item)
-//        } else {
-//            item.copy(children = updateItemInList(item.children, itemId, update))
-//        }
-//    }.toMutableList()
-//}
-//
-//@Composable
-//fun UpdateNestedTextFieldItem(
-//    item: NestedTextField,
-//    onAddChild: (NestedTextField) -> Unit,
-//    onTextChange: (NestedTextField, String) -> Unit,
-//    level: Int = 0,
-//    modifier: Modifier = Modifier
-//) {
-//    Column(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .padding(start = (level * 16).dp)
-//            .background(Color(0xFFF5F5F5))
-//    ) {
-//        if (level > 0) {
-//            Box(
-//                modifier = Modifier
-//                    .offset(x = (-16).dp)
-//                    .padding(end = 8.dp)
-//                    .size(24.dp)
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.ArrowRight,
-//                    contentDescription = "Child item indicator",
-//                    tint = MaterialTheme.colorScheme.outline,
-//                    modifier = Modifier
-//                        .size(64.dp)
-//                        .align(Alignment.Center)
-//                )
-//            }
-//        }
-//
-//        val labelText = if (level == 0) "Ana Görev" else "Alt Görev"
-//
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            FormTextField(
-//                value = item.text,
-//                onValueChange = { onTextChange(item, it) },
-//                label = labelText,
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .padding(8.dp),
-//                singleLine = true
-//            )
-//
-//            if (level == 0) {
-//                IconButton(
-//                    onClick = { onAddChild(item) },
-//                    modifier = Modifier
-//                        .size(32.dp)
-//                        .clip(CircleShape)
-//                        .background(Color.White.copy(alpha = 0.3f))
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Add,
-//                        contentDescription = "Add child",
-//                        tint = Color.Black,
-//                        modifier = Modifier.size(16.dp)
-//                    )
-//                }
-//            } else {
-//                Spacer(modifier = Modifier.size(32.dp))
-//            }
-//        }
-//
-//
-//        if (item.isExpanded) {
-//            item.children.forEach { child ->
-//                NestedTextFieldItem(
-//                    item = child,
-//                    onAddChild = onAddChild,
-//                    onTextChange = onTextChange,
-//                    level = level + 1
-//                )
-//            }
-//        }
-//    }
-//}
-
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ozan.kotlintodoproject.model.Task
 import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
+import com.ozan.kotlintodoproject.viewmodel.SharedViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskItem(
     task: Task,
+    isSubtask: Boolean = false,
     onTaskClick: () -> Unit,
-    onCheckboxClick: (Boolean) -> Unit
+    onCheckboxClick: (Boolean) -> Unit,
+    onDeleteClick: () -> Unit
 ) {
-    androidx.compose.material.Card(
+    val startPadding = if (isSubtask) 56.dp else 16.dp
+    val cardColors = CardDefaults.cardColors(
+        containerColor = if (isSubtask) Color(0xFFEDEDED) else Color.White
+    )
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onTaskClick() }
+            .padding(vertical = if (isSubtask) 2.dp else 4.dp)
+            .clickable { onTaskClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSubtask) 1.dp else 2.dp),
+        colors = cardColors
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(start = startPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            androidx.compose.material.Checkbox(
+            if (isSubtask) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Alt görev",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = 12.dp)
+                )
+            } else {
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Checkbox(
                 checked = task.isDone ?: false,
-                onCheckedChange = onCheckboxClick
+                onCheckedChange = onCheckboxClick,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFF4CAF50)
+                ),
+                modifier = Modifier.padding(end = 12.dp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
+
             Text(
                 text = task.taskname ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                fontSize = 18.sp
+                fontSize = if (isSubtask) 16.sp else 18.sp,
+                fontWeight = if (isSubtask) FontWeight.Normal else FontWeight.SemiBold,
+                color = if (task.isDone == true) Color.Gray else MaterialTheme.colorScheme.onSurface,
+                textDecoration = if (task.isDone == true) TextDecoration.LineThrough else TextDecoration.None,
+                modifier = Modifier.weight(1f)
             )
+
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Görevi sil",
+                    tint = Color.Black
+                )
+            }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateProjectDetailScreen(
     projectId: String?,
     onBack: () -> Unit,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    projectViewModel: ProjectViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel = hiltViewModel()
 ) {
     val tasks by projectViewModel.tasks.collectAsState()
 
@@ -216,24 +115,30 @@ fun UpdateProjectDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { androidx.compose.material3.Text("Görevleri Düzenleyin") },
+                title = {
+                    Text(
+                        text = "Görevleri Düzenleyin",
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Geri",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
                 actions = {
                     IconButton(
-                        onClick = {},
-                        modifier = Modifier.padding(end = 8.dp)
+                        onClick = {  }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Görev Ekle"
+                            contentDescription = "Görev Ekle",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
@@ -251,43 +156,58 @@ fun UpdateProjectDetailScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
+            val groupedTasks = tasks.groupBy { it.parentId }
+            val mainTasks = tasks.filter { it.parentId == null }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(tasks) { task ->
-                    TaskItem(
-                        task = task,
-                        onTaskClick = {  },
-                        onCheckboxClick = { isChecked ->
-                            task.id?.let { taskId ->
-                                projectViewModel.updateTaskIsDone(taskId, isChecked)
+                items(mainTasks) { mainTask ->
+                    Column(
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    ) {
+                        TaskItem(
+                            task = mainTask,
+                            isSubtask = false,
+                            onTaskClick = {  },
+                            onCheckboxClick = { isChecked ->
+                                projectViewModel.updateTaskIsDone(mainTask.id, isChecked)
+                            },
+                            onDeleteClick = {
+                                projectViewModel.deleteTask(mainTask.id)
                             }
+                        )
+
+                        val subtasks = groupedTasks[mainTask.id] ?: emptyList()
+                        subtasks.forEach { subtask ->
+                            TaskItem(
+                                task = subtask,
+                                isSubtask = true,
+                                onTaskClick = {  },
+                                onCheckboxClick = { isChecked ->
+                                    projectViewModel.updateTaskIsDone(subtask.id, isChecked)
+                                },
+                                onDeleteClick = {
+                                    projectViewModel.deleteTask(subtask.id)
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-
             Button(
-                onClick = {},
+                onClick = {  },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                    .padding(vertical = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4300CC))
             ) {
-                androidx.compose.material3.Text("Kaydet", color = Color.White)
+                Text("Kaydet", color = Color.White)
             }
-
         }
     }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TestThisScreen(){
-
 }

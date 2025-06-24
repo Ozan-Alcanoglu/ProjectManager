@@ -95,10 +95,25 @@ class ProjectViewModel @Inject constructor(
 
     fun updateTaskIsDone(taskId: String, isDone: Boolean) {
         viewModelScope.launch {
+            taskService.updateTaskIsDone(taskId, isDone)
+            currentProject?.id?.let { projectId ->
+                loadTasksByProjectId(projectId)
+            }
+        }
+    }
+
+    fun deleteTask(taskId: String) {
+        viewModelScope.launch {
             try {
-                taskService.updateTaskIsDone(taskId = taskId, isDone = isDone)
+                val task = taskService.getTaskById(taskId)
+                task?.let {
+                    taskService.deleteTask(it)
+                    currentProject?.id?.let { projectId ->
+                        loadTasksByProjectId(projectId)
+                    }
+                }
             } catch (e: Exception) {
-                Log.e("ProjectViewmodel", "taskları güncellerken hata oldu: {e}", e)
+                Log.e("ProjectViewModel", "Görev silinirken hata oluştu: ${e.message}")
             }
         }
     }
