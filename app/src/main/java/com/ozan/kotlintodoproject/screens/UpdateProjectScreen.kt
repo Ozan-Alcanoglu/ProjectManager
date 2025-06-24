@@ -206,7 +206,9 @@ fun UpdateProject(
 
                 TextButton(
                     onClick = {
-                        navController.navigate("update_projectdetail")
+                        projectViewModel.currentProject?.id?.let { projectId ->
+                            navController.navigate("update_projectdetail/$projectId")
+                        }
                     }
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {

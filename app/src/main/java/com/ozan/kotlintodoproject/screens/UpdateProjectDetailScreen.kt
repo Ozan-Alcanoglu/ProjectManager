@@ -1,6 +1,8 @@
 package com.ozan.kotlintodoproject.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -152,11 +155,63 @@ import com.ozan.kotlintodoproject.ui.components.FormTextField
 //    }
 //}
 
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ozan.kotlintodoproject.model.Task
+import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TaskItem(
+    task: Task,
+    onTaskClick: () -> Unit,
+    onCheckboxClick: (Boolean) -> Unit
+) {
+    androidx.compose.material.Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onTaskClick() }
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            androidx.compose.material.Checkbox(
+                checked = task.isDone ?: false,
+                onCheckedChange = onCheckboxClick
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = task.taskname ?: "",
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 18.sp
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateProjectDetailScreen(
-    onBack: () -> Unit
+    projectId: String?,
+    onBack: () -> Unit,
+    projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
+    val tasks by projectViewModel.tasks.collectAsState()
+
+    LaunchedEffect(projectId) {
+        projectId?.let { id ->
+            projectViewModel.loadTasksByProjectId(id)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -189,12 +244,29 @@ fun UpdateProjectDetailScreen(
                 )
             )
         }
-    ) {padding->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-
-
-            Text("messi")
-
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(tasks) { task ->
+                    TaskItem(
+                        task = task,
+                        onTaskClick = {  },
+                        onCheckboxClick = { isChecked ->
+                            task.id?.let { taskId ->
+                                projectViewModel.updateTaskIsDone(taskId, isChecked)
+                            }
+                        }
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 

@@ -20,7 +20,9 @@ sealed class Screen(val route: String) {
     object ProjectList : Screen("project_list")
     object ProjectDetail : Screen("project_detail")
     object UpdateProject : Screen("update_project")
-    object UpdateProjectDetailScreen : Screen("update_projectdetail")
+    object UpdateProjectDetailScreen : Screen("update_projectdetail/{projectId}") {
+        fun createRoute(projectId: String) = "update_projectdetail/$projectId"
+    }
     object AddProject : Screen("add_project")
     object EditProject : Screen("edit_project/{projectId}") {
         fun createRoute(projectId: String) = "edit_project/$projectId"
@@ -104,13 +106,20 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.UpdateProjectDetailScreen.route) {
-
-            UpdateProjectDetailScreen(
-                onBack = { navController.navigateUp() }
+        composable(
+            route = Screen.UpdateProjectDetailScreen.route,
+            arguments = listOf(
+                navArgument("projectId") {
+                    type = NavType.StringType
+                }
             )
-
-
+        ) { backStackEntry ->
+            val projectId = backStackEntry.arguments?.getString("projectId")
+            UpdateProjectDetailScreen(
+                projectId = projectId,
+                onBack = { navController.navigateUp() },
+                projectViewModel = projectViewModel
+            )
         }
 
     }
