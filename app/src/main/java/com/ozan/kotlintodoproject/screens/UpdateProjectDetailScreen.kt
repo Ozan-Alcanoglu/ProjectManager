@@ -1,5 +1,7 @@
 package com.ozan.kotlintodoproject.screens
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -22,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ozan.kotlintodoproject.model.Task
 import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
 import com.ozan.kotlintodoproject.viewmodel.SharedViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun TaskItem(
@@ -29,7 +33,8 @@ fun TaskItem(
     isSubtask: Boolean = false,
     onTaskClick: () -> Unit,
     onCheckboxClick: (Boolean) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onAddSubtaskClick: () -> Unit = {}
 ) {
     val startPadding = if (isSubtask) 56.dp else 16.dp
     val cardColors = CardDefaults.cardColors(
@@ -54,9 +59,9 @@ fun TaskItem(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Alt görev",
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = Color.Black,
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(35.dp)
                         .padding(end = 12.dp)
                 )
             } else {
@@ -76,10 +81,23 @@ fun TaskItem(
                 text = task.taskname ?: "",
                 fontSize = if (isSubtask) 16.sp else 18.sp,
                 fontWeight = if (isSubtask) FontWeight.Normal else FontWeight.SemiBold,
-                color = if (task.isDone == true) Color.Gray else MaterialTheme.colorScheme.onSurface,
+                color = if (task.isDone == true) Color.Gray else Color.Black,
                 textDecoration = if (task.isDone == true) TextDecoration.LineThrough else TextDecoration.None,
                 modifier = Modifier.weight(1f)
             )
+
+            if (!isSubtask) {
+                IconButton(
+                    onClick = onAddSubtaskClick,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Alt görev ekle",
+                        tint = Color.Black
+                    )
+                }
+            }
 
             IconButton(
                 onClick = onDeleteClick,
@@ -95,7 +113,6 @@ fun TaskItem(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateProjectDetailScreen(
@@ -105,6 +122,18 @@ fun UpdateProjectDetailScreen(
     sharedViewModel: SharedViewModel = hiltViewModel()
 ) {
     val tasks by projectViewModel.tasks.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var showAddDialog by remember { mutableStateOf(false) }
+    var newTaskName by remember { mutableStateOf("") }
+
+    var showSubtaskDialog by remember { mutableStateOf(false) }
+    var currentParentTask: Task? by remember { mutableStateOf(null) }
+    var subtaskName by remember { mutableStateOf("") }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var taskToDelete by remember { mutableStateOf<Task?>(null) }
 
     LaunchedEffect(projectId) {
         projectId?.let { id ->
@@ -113,13 +142,14 @@ fun UpdateProjectDetailScreen(
     }
 
     Scaffold(
+        containerColor = Color(0xFFF5F5F5),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = "Görevleri Düzenleyin",
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
@@ -127,18 +157,16 @@ fun UpdateProjectDetailScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Geri",
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = Color.White
                         )
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = {  }
-                    ) {
+                    IconButton(onClick = { showAddDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Görev Ekle",
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = Color.White
                         )
                     }
                 },
@@ -155,6 +183,8 @@ fun UpdateProjectDetailScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
+                .background(Color(0xFFF5F5F5))
+
         ) {
             val groupedTasks = tasks.groupBy { it.parentId }
             val mainTasks = tasks.filter { it.parentId == null }
@@ -164,18 +194,22 @@ fun UpdateProjectDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(mainTasks) { mainTask ->
-                    Column(
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    ) {
+                    Column(modifier = Modifier.padding(bottom = 12.dp)) {
                         TaskItem(
                             task = mainTask,
                             isSubtask = false,
-                            onTaskClick = {  },
+                            onTaskClick = {},
                             onCheckboxClick = { isChecked ->
                                 projectViewModel.updateTaskIsDone(mainTask.id, isChecked)
                             },
                             onDeleteClick = {
-                                projectViewModel.deleteTask(mainTask.id)
+                                taskToDelete = mainTask
+                                showDeleteDialog = true
+                            },
+                            onAddSubtaskClick = {
+                                currentParentTask = mainTask
+                                showSubtaskDialog = true
+                                subtaskName = ""
                             }
                         )
 
@@ -184,12 +218,13 @@ fun UpdateProjectDetailScreen(
                             TaskItem(
                                 task = subtask,
                                 isSubtask = true,
-                                onTaskClick = {  },
+                                onTaskClick = {},
                                 onCheckboxClick = { isChecked ->
                                     projectViewModel.updateTaskIsDone(subtask.id, isChecked)
                                 },
                                 onDeleteClick = {
-                                    projectViewModel.deleteTask(subtask.id)
+                                    taskToDelete = subtask
+                                    showDeleteDialog = true
                                 }
                             )
                         }
@@ -200,7 +235,7 @@ fun UpdateProjectDetailScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = {  },
+                onClick = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
@@ -209,5 +244,113 @@ fun UpdateProjectDetailScreen(
                 Text("Kaydet", color = Color.White)
             }
         }
+    }
+
+    if (showAddDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showAddDialog = false
+                    projectId?.let { pid ->
+                        coroutineScope.launch {
+                            val branchResult = sharedViewModel.addBranch(newTaskName)
+                            branchResult.onSuccess { branch ->
+                                sharedViewModel.addTask(
+                                    projectId = pid,
+                                    branchId = branch.id,
+                                    taskname = newTaskName,
+                                    parentId = null
+                                )
+                                Toast.makeText(context, "Görev eklendi", Toast.LENGTH_SHORT).show()
+                                projectViewModel.loadTasksByProjectId(pid)
+                            }
+                        }
+                    }
+                }) {
+                    Text("Ekle")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddDialog = false }) {
+                    Text("İptal")
+                }
+            },
+            title = { Text("Yeni Ana Görev") },
+            text = {
+                OutlinedTextField(
+                    value = newTaskName,
+                    onValueChange = { newTaskName = it },
+                    label = { Text("Görev adı") }
+                )
+            }
+        )
+    }
+
+    if (showSubtaskDialog) {
+        AlertDialog(
+            onDismissRequest = { showSubtaskDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSubtaskDialog = false
+                    val parent = currentParentTask
+                    val branchId = parent?.branchId
+                    val pid = projectId
+                    if (parent != null && branchId != null && pid != null) {
+                        coroutineScope.launch {
+                            sharedViewModel.addTask(
+                                projectId = pid,
+                                branchId = branchId,
+                                taskname = subtaskName,
+                                parentId = parent.id
+                            )
+                            Toast.makeText(context, "Alt görev eklendi", Toast.LENGTH_SHORT).show()
+                            projectViewModel.loadTasksByProjectId(pid)
+                        }
+                    }
+                }) {
+                    Text("Ekle")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSubtaskDialog = false }) {
+                    Text("İptal")
+                }
+            },
+            title = { Text("Alt Görev Ekle") },
+            text = {
+                OutlinedTextField(
+                    value = subtaskName,
+                    onValueChange = { subtaskName = it },
+                    label = { Text("Alt görev adı") }
+                )
+            }
+        )
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    taskToDelete?.let { task ->
+                        coroutineScope.launch {
+                            projectViewModel.deleteTask(task.id)
+                            projectId?.let { projectViewModel.loadTasksByProjectId(it) }
+                        }
+                    }
+                    showDeleteDialog = false
+                }) {
+                    Text("Sil")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("İptal")
+                }
+            },
+            title = { Text("Görevi Sil") },
+            text = { Text("Bu görevi silmek istediğinize emin misiniz?") }
+        )
     }
 }
