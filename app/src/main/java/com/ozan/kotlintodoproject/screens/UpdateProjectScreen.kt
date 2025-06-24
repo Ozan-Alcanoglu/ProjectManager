@@ -11,6 +11,7 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
 import com.ozan.kotlintodoproject.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
@@ -33,7 +36,8 @@ import kotlinx.coroutines.launch
 fun UpdateProject(
     onBack: () -> Unit,
     sharedViewModel: SharedViewModel = hiltViewModel(),
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    projectViewModel: ProjectViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val tasks by projectViewModel.tasks.collectAsState()
     val checkboxStates = remember { mutableStateMapOf<String, Boolean>() }
@@ -186,13 +190,43 @@ fun UpdateProject(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            Text(
-                text = "Görevler:",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 12.dp, top = 16.dp, bottom = 8.dp),
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Görevler:",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f)
+                )
+
+                TextButton(
+                    onClick = {
+                        navController.navigate("update_projectdetail")
+                    }
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Görevleri Yönet",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Görevleri Yönet",
+                            fontSize = 16.sp,
+                            color = Color(0xFF4300CC)
+                        )
+                    }
+                }
+
+            }
+
+
 
             val groupedTasks = tasks.groupBy { it.parentId }
 

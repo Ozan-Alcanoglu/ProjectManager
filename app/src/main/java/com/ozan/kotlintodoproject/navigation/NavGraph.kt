@@ -11,6 +11,7 @@ import com.ozan.kotlintodoproject.screens.ProjectListScreen
 import com.ozan.kotlintodoproject.screens.ProjectDetail
 import com.ozan.kotlintodoproject.screens.ProjectCreateScreen
 import com.ozan.kotlintodoproject.screens.UpdateProject
+import com.ozan.kotlintodoproject.screens.UpdateProjectDetailScreen
 import com.ozan.kotlintodoproject.viewmodel.ProjectViewModel
 import com.ozan.kotlintodoproject.viewmodel.SharedViewModel
 
@@ -19,6 +20,7 @@ sealed class Screen(val route: String) {
     object ProjectList : Screen("project_list")
     object ProjectDetail : Screen("project_detail")
     object UpdateProject : Screen("update_project")
+    object UpdateProjectDetailScreen : Screen("update_projectdetail")
     object AddProject : Screen("add_project")
     object EditProject : Screen("edit_project/{projectId}") {
         fun createRoute(projectId: String) = "edit_project/$projectId"
@@ -98,7 +100,17 @@ fun NavGraph(
             UpdateProject(
                 onBack = {navController.navigateUp()},
                 projectViewModel = projectViewModel,
+                navController = navController
             )
+        }
+
+        composable(Screen.UpdateProjectDetailScreen.route) {
+
+            UpdateProjectDetailScreen(
+                onBack = { navController.navigateUp() }
+            )
+
+
         }
 
     }

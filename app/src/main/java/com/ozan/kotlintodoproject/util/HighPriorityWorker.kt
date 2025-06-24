@@ -12,7 +12,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ozan.kotlintodoproject.MainActivity
 import com.ozan.kotlintodoproject.ProjectApplication
-// R sınıfı kullanılmıyor
 import com.ozan.kotlintodoproject.service.ProjectService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -35,19 +34,17 @@ class HighPriorityWorker @AssistedInject constructor(
             Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
-            // Hata durumunda işi tekrar dene
             Result.retry()
         }
     }
 
     private fun showNotification(projects: List<com.ozan.kotlintodoproject.model.Project>) {
-        val notificationManager = 
+        val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        
+
         val channelId = ProjectApplication.HIGH_PRIORITY_CHANNEL_ID
         val channelName = "Yüksek Öncelikli Projeler"
-        
-        // Android 8.0 ve üzeri için bildirim kanalı oluştur
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -60,11 +57,10 @@ class HighPriorityWorker @AssistedInject constructor(
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Tıklandığında açılacak aktivite
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        
+
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,
@@ -72,9 +68,8 @@ class HighPriorityWorker @AssistedInject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Bildirimi oluştur
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)  // Varsayılan bir ikon kullanıyoruz
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("⏰ Yüksek Öncelikli Projeleriniz Var!")
             .setContentText("${projects.size} adet yüksek öncelikli projeniz var.")
             .setStyle(NotificationCompat.BigTextStyle()
@@ -84,7 +79,6 @@ class HighPriorityWorker @AssistedInject constructor(
             .setContentIntent(pendingIntent)
             .build()
 
-        // Bildirimi göster
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
